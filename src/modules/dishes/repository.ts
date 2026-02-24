@@ -1,10 +1,16 @@
 import type { Pool } from "pg";
 
 import type { CatalogDishRow, CatalogListQuery, DishSort } from "../../types/catalog.js";
+import type { DishDetailRow, DishDetailStepRow } from "../../types/dish-detail.js";
 
 interface CatalogRowsResult {
   rows: CatalogDishRow[];
   total: number;
+}
+
+interface DishDetailRowsResult {
+  dish: DishDetailRow;
+  steps: DishDetailStepRow[];
 }
 
 const ORDER_BY: Record<DishSort, string> = {
@@ -86,6 +92,53 @@ export class DishesRepository {
     return {
       rows: dataResult.rows,
       total: Number(countResult.rows[0]?.total ?? 0)
+    };
+  }
+
+  async findActiveDetailById(dishId: number): Promise<DishDetailRowsResult | null> {
+    const dishResult = await this.pool.query<DishDetailRow>(
+      `
+      SELECT
+        d.id,
+        d.name,
+        d.description,
+        d.difficulty,
+        d.estimated_total_seconds,
+        d.cover_image_url,
+        d.ingredients_json,
+        COALESCE(v.today_total_count, 0)::int AS db_today_count
+      FROM dishes d
+      LEFT JOIN v_dish_today_counts v ON v.dish_id = d.id
+      WHERE d.id = $1
+        AND d.is_active = TRUE
+      LIMIT 1;
+      `,
+      [dishId]
+    );
+
+    const dish = dishResult.rows[0];
+    if (!dish) {
+      return null;
+    }
+
+    const stepsResult = await this.pool.query<DishDetailStepRow>(
+      `
+      SELECT
+        step_no,
+        title,
+        instruction,
+        timer_seconds,
+        remind_mode
+      FROM dish_steps
+      WHERE dish_id = $1
+      ORDER BY step_no ASC;
+      `,
+      [dishId]
+    );
+
+    return {
+      dish,
+      steps: stepsResult.rows
     };
   }
 }

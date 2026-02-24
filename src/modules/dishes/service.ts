@@ -1,5 +1,6 @@
 import type { RedisClient } from "../../infrastructure/redis.js";
 import type { CatalogDishItem, CatalogListQuery, CatalogListResponse } from "../../types/catalog.js";
+import type { DishDetailResponse, DishIngredientItem } from "../../types/dish-detail.js";
 import { DishesRepository } from "./repository.js";
 
 const TODAY_COUNTER_TTL_DAYS = 3;
@@ -9,6 +10,27 @@ const buildTodayCounterKey = (dishId: number, now = new Date()): string => {
   const month = String(now.getUTCMonth() + 1).padStart(2, "0");
   const day = String(now.getUTCDate()).padStart(2, "0");
   return `chef:today:cook_count:${year}${month}${day}:${dishId}`;
+};
+
+const normalizeIngredients = (ingredientsValue: unknown): DishIngredientItem[] => {
+  if (!Array.isArray(ingredientsValue)) {
+    return [];
+  }
+
+  return ingredientsValue.flatMap((item) => {
+    if (typeof item !== "object" || item === null) {
+      return [];
+    }
+
+    const record = item as Record<string, unknown>;
+    const name = record.name;
+    const amount = record.amount;
+    if (typeof name !== "string" || typeof amount !== "string") {
+      return [];
+    }
+
+    return [{ name, amount }];
+  });
 };
 
 export class DishesService {
@@ -36,6 +58,34 @@ export class DishesService {
       page_size: query.pageSize,
       total: result.total,
       items
+    };
+  }
+
+  async getDishDetail(dishId: number): Promise<DishDetailResponse | null> {
+    const result = await this.repository.findActiveDetailById(dishId);
+    if (!result) {
+      return null;
+    }
+
+    const todayCount = await this.getTodayCount(result.dish.id, result.dish.db_today_count);
+    const ingredients = normalizeIngredients(result.dish.ingredients_json);
+
+    return {
+      id: result.dish.id,
+      name: result.dish.name,
+      description: result.dish.description,
+      difficulty: result.dish.difficulty,
+      estimated_total_seconds: result.dish.estimated_total_seconds,
+      cover_image_url: result.dish.cover_image_url,
+      today_cook_count: todayCount,
+      ingredients,
+      steps: result.steps.map((step) => ({
+        step_no: step.step_no,
+        title: step.title,
+        instruction: step.instruction,
+        timer_seconds: step.timer_seconds,
+        remind_mode: step.remind_mode
+      }))
     };
   }
 
@@ -67,6 +117,29 @@ export class DishesService {
     } catch (error) {
       this.logger.warn("Failed to read today counts from Redis. Falling back to PostgreSQL.", error);
       return items;
+    }
+  }
+
+  private async getTodayCount(dishId: number, fallbackValue: number): Promise<number> {
+    if (!this.redis) {
+      return fallbackValue;
+    }
+
+    try {
+      const value = await this.redis.get(buildTodayCounterKey(dishId));
+      if (value === null) {
+        return fallbackValue;
+      }
+
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        return fallbackValue;
+      }
+
+      return parsed;
+    } catch (error) {
+      this.logger.warn("Failed to read today count from Redis. Falling back to PostgreSQL.", error);
+      return fallbackValue;
     }
   }
 }

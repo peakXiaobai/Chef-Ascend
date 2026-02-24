@@ -4,7 +4,7 @@ Base path: `/api/v1`
 Content type: `application/json`
 
 Implementation status:
-- Implemented: `GET /dishes`
+- Implemented: `GET /dishes`, `GET /dishes/{dish_id}`
 - Planned: other endpoints in this document
 
 ## 1) List Dishes
@@ -51,6 +51,7 @@ Implementation status:
   "description": "Simple home-style dish",
   "difficulty": 1,
   "estimated_total_seconds": 900,
+  "cover_image_url": "https://...",
   "today_cook_count": 52,
   "ingredients": [
     { "name": "egg", "amount": "3" },

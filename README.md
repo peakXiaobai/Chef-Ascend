@@ -22,7 +22,7 @@ Core product goals:
 ### API Implementation
 
 - [x] Module 1: Catalog API (`GET /api/v1/dishes`)
-- [ ] Module 2: Dish detail API
+- [x] Module 2: Dish detail API (`GET /api/v1/dishes/:dish_id`)
 - [ ] Module 3: Cook mode API
 - [ ] Module 4: Completion record API
 - [ ] Module 5: Dedicated today count endpoint (optional)
@@ -126,15 +126,22 @@ Required env vars:
 - `DATABASE_URL` (for PostgreSQL)
 - `REDIS_URL` (for Redis)
 
-## Module 1 Endpoint (Implemented)
+## Implemented Endpoints
+
+Module 1:
 
 ```bash
 curl "http://localhost:3000/api/v1/dishes?page=1&page_size=20&sort=popular_today"
 ```
 
+Module 2:
+
+```bash
+curl "http://localhost:3000/api/v1/dishes/101"
+```
+
 ## Next Build Order
 
-1. Module 2: `GET /api/v1/dishes/{dish_id}`
-2. Module 3: cook session + timer actions
-3. Module 4: complete session + user history
-4. Module 5: optional dedicated today-count endpoint
+1. Module 3: cook session + timer actions
+2. Module 4: complete session + user history
+3. Module 5: optional dedicated today-count endpoint

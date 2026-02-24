@@ -43,3 +43,22 @@
   - `docs/modules/01-catalog.md`
 - Follow-up:
   - Implement Module 2 dish detail endpoint
+
+## 2026-02-24 (Phase 3 - Module 2)
+
+- Owner: Codex
+- Scope:
+  - Implemented Module 2 `GET /api/v1/dishes/{dish_id}`
+  - Added repository query for active dish detail and ordered steps
+  - Added Redis today-count override with PostgreSQL fallback
+  - Updated API and module docs with implementation status
+- Files changed:
+  - `src/modules/dishes/repository.ts`
+  - `src/modules/dishes/routes.ts`
+  - `src/modules/dishes/service.ts`
+  - `src/types/dish-detail.ts`
+  - `README.md`
+  - `docs/api/API_V1.md`
+  - `docs/modules/02-dish-detail.md`
+- Follow-up:
+  - Implement Module 3 cook session and timer endpoints

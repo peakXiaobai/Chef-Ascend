@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply } from "fastify";
 import { z } from "zod";
 
 import { DISH_SORT_VALUES } from "../../types/catalog.js";
@@ -12,6 +12,24 @@ const listDishesQuerySchema = z.object({
   sort: z.enum(DISH_SORT_VALUES).default("popular_today")
 });
 
+const dishIdParamsSchema = z.object({
+  dish_id: z.coerce.number().int().positive()
+});
+
+const buildValidationIssues = (issues: z.ZodIssue[]): Array<{ path: string; message: string }> => {
+  return issues.map((issue) => ({
+    path: issue.path.join("."),
+    message: issue.message
+  }));
+};
+
+const sendValidationError = (reply: FastifyReply, issues: Array<{ path: string; message: string }>) => {
+  return reply.code(400).send({
+    message: "Invalid request parameters",
+    issues
+  });
+};
+
 export const registerDishRoutes = async (
   app: FastifyInstance,
   service: DishesService
@@ -20,13 +38,7 @@ export const registerDishRoutes = async (
     const parsed = listDishesQuerySchema.safeParse(request.query);
 
     if (!parsed.success) {
-      return reply.code(400).send({
-        message: "Invalid query parameters",
-        issues: parsed.error.issues.map((issue) => ({
-          path: issue.path.join("."),
-          message: issue.message
-        }))
-      });
+      return sendValidationError(reply, buildValidationIssues(parsed.error.issues));
     }
 
     const query = parsed.data;
@@ -39,5 +51,21 @@ export const registerDishRoutes = async (
     });
 
     return reply.code(200).send(result);
+  });
+
+  app.get("/api/v1/dishes/:dish_id", async (request, reply) => {
+    const parsed = dishIdParamsSchema.safeParse(request.params);
+    if (!parsed.success) {
+      return sendValidationError(reply, buildValidationIssues(parsed.error.issues));
+    }
+
+    const detail = await service.getDishDetail(parsed.data.dish_id);
+    if (!detail) {
+      return reply.code(404).send({
+        message: "Dish not found"
+      });
+    }
+
+    return reply.code(200).send(detail);
   });
 };

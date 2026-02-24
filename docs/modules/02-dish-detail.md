@@ -26,3 +26,12 @@ Show full cooking context of one dish before the user starts cook mode.
 - Timer value present for each step (`0` allowed)
 - Includes today count in response
 - Returns 404 for inactive or missing dish
+
+## Implementation Status
+
+- Status: Implemented (API v1)
+- Route: `GET /api/v1/dishes/{dish_id}`
+- Main files:
+  - `src/modules/dishes/routes.ts`
+  - `src/modules/dishes/service.ts`
+  - `src/modules/dishes/repository.ts`
