@@ -1,43 +1,46 @@
 # Chef Ascend
 
-Chef Ascend is a cooking companion product focused on guided execution, not just recipe reading.
+Chef Ascend is a cooking companion focused on step-by-step execution with timer reminders.
 
-Primary product goals:
+Core product goals:
 - Dish catalog browsing
-- Dish detail with structured steps
-- Cook mode with per-step timer and reminder
+- Dish detail view
+- Cook mode with per-step timers/reminders
 - Completion record tracking
 - Today cook count display
 
-## Current Delivery Scope (Phase 1)
+## Delivery Progress
 
-This repository currently delivers:
-- Product and engineering documentation for the 5 core modules
-- Database schema and seed scripts (PostgreSQL)
-- Redis key planning and atomic counter script
-- Initialization scripts for later server deployment
+### Spec & Data Layer
 
-## Core Modules
+- [x] Module 1: Catalog spec + schema
+- [x] Module 2: Dish detail spec + schema
+- [x] Module 3: Cook mode spec + schema
+- [x] Module 4: Completion record spec + schema
+- [x] Module 5: Today count spec + schema + Redis Lua
 
-- [x] Module 1: Catalog (list/filter/sort)
-- [x] Module 2: Dish Detail (ingredients/steps/time)
-- [x] Module 3: Cook Mode (session, step timer, reminder state)
-- [x] Module 4: Completion Record (success/fail, rating, note)
-- [x] Module 5: Today Count Display (Redis fast path + DB fallback)
+### API Implementation
 
-> Note: In this phase, the modules are completed at the architecture/data/API contract level. Business code implementation can now proceed module by module.
+- [x] Module 1: Catalog API (`GET /api/v1/dishes`)
+- [ ] Module 2: Dish detail API
+- [ ] Module 3: Cook mode API
+- [ ] Module 4: Completion record API
+- [ ] Module 5: Dedicated today count endpoint (optional)
 
-## Planned Runtime Architecture
+## Runtime Architecture
 
-- App service: API + timer orchestration
-- PostgreSQL: source of truth (dishes, steps, sessions, records, daily stats)
-- Redis: low-latency counters and temporary cook mode state
+- API service (TypeScript + Fastify)
+- PostgreSQL as source of truth
+- Redis for today counters and session runtime cache
 
 ## Repository Structure
 
 ```text
 Chef-Ascend/
 ├── README.md
+├── package.json
+├── tsconfig.json
+├── .env.example
 ├── docs/
 │   ├── ARCHITECTURE.md              # system architecture and request flow
 │   ├── COLLABORATION.md             # conventions for multi-model collaboration
@@ -64,12 +67,53 @@ Chef-Ascend/
 │       ├── 001_key_design.md        # redis key conventions
 │       └── scripts/
 │           └── incr_today_count.lua # atomic increment + expire script
+├── src/
+│   ├── config/
+│   │   └── env.ts                   # env parsing and validation
+│   ├── infrastructure/
+│   │   ├── postgres.ts              # pg connection pool
+│   │   └── redis.ts                 # redis connection helper
+│   ├── modules/
+│   │   └── dishes/
+│   │       ├── repository.ts        # catalog SQL query logic
+│   │       ├── routes.ts            # /api/v1/dishes route
+│   │       └── service.ts           # redis merge + response shaping
+│   ├── types/
+│   │   └── catalog.ts               # catalog domain types
+│   └── server.ts                    # app bootstrap
 └── scripts/
     ├── init_postgres.sh             # run postgres scripts in order
     └── init_redis.sh                # load/test redis lua script
 ```
 
-## Database Initialization (Later on Server)
+## Local Setup
+
+1) Install dependencies:
+
+```bash
+npm install
+```
+
+2) Copy env file:
+
+```bash
+cp .env.example .env
+```
+
+3) Initialize PostgreSQL and Redis (after setting env):
+
+```bash
+bash scripts/init_postgres.sh
+bash scripts/init_redis.sh
+```
+
+4) Start API:
+
+```bash
+npm run dev
+```
+
+## Database Initialization (Server)
 
 When deployed to your server, run:
 
@@ -82,10 +126,15 @@ Required env vars:
 - `DATABASE_URL` (for PostgreSQL)
 - `REDIS_URL` (for Redis)
 
-## Recommended Build Order (After This Phase)
+## Module 1 Endpoint (Implemented)
 
-1. Implement Module 1 + Module 2 read APIs
-2. Implement Module 3 session/timer state machine
-3. Implement Module 4 completion write path
-4. Wire Module 5 today count cache update and fallback query
-5. Add auth, monitoring, and deployment pipeline
+```bash
+curl "http://localhost:3000/api/v1/dishes?page=1&page_size=20&sort=popular_today"
+```
+
+## Next Build Order
+
+1. Module 2: `GET /api/v1/dishes/{dish_id}`
+2. Module 3: cook session + timer actions
+3. Module 4: complete session + user history
+4. Module 5: optional dedicated today-count endpoint

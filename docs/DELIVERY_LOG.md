@@ -23,3 +23,23 @@
   - `scripts/init_redis.sh`
 - Follow-up:
   - Implement API handlers and service layer by module order (01 -> 05)
+
+## 2026-02-24 (Phase 2 - Module 1)
+
+- Owner: Codex
+- Scope:
+  - Bootstrapped TypeScript + Fastify API service
+  - Implemented Module 1 `GET /api/v1/dishes` with filter/sort/pagination
+  - Added PostgreSQL + Redis integration (Redis miss fallback to DB values)
+  - Updated README with code structure and local startup steps
+- Files changed:
+  - `.gitignore`
+  - `.env.example`
+  - `package.json`
+  - `tsconfig.json`
+  - `src/**`
+  - `README.md`
+  - `docs/api/API_V1.md`
+  - `docs/modules/01-catalog.md`
+- Follow-up:
+  - Implement Module 2 dish detail endpoint

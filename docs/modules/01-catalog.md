@@ -33,3 +33,12 @@ Query params:
 - Stable pagination and sort
 - Includes fallback today count when Redis key is missing
 - Response latency target <= 300ms (single page)
+
+## Implementation Status
+
+- Status: Implemented (API v1)
+- Route: `GET /api/v1/dishes`
+- Main files:
+  - `src/modules/dishes/routes.ts`
+  - `src/modules/dishes/service.ts`
+  - `src/modules/dishes/repository.ts`

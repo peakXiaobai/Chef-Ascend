@@ -3,6 +3,10 @@
 Base path: `/api/v1`
 Content type: `application/json`
 
+Implementation status:
+- Implemented: `GET /dishes`
+- Planned: other endpoints in this document
+
 ## 1) List Dishes
 
 `GET /dishes`
