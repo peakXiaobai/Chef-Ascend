@@ -16,6 +16,13 @@ Implementation status:
   - `POST /cook-sessions/{session_id}/timer/reset`
   - `POST /cook-sessions/{session_id}/complete`
   - `GET /users/{user_id}/cook-records`
+  - `GET /admin/dishes` (web console page)
+  - `GET /api/v1/admin/categories`
+  - `GET /api/v1/admin/dishes`
+  - `GET /api/v1/admin/dishes/{dish_id}`
+  - `POST /api/v1/admin/dishes`
+  - `PUT /api/v1/admin/dishes/{dish_id}`
+  - `PATCH /api/v1/admin/dishes/{dish_id}/active`
 - Planned: other endpoints in this document
 
 ## 1) List Dishes
@@ -212,3 +219,59 @@ Implementation status:
 - `404` dish/session/user not found
 - `409` state conflict (duplicate complete, invalid step order)
 - `500` unexpected server error
+
+## 9) Admin Dish Console
+
+- Page: `GET /admin/dishes`
+- API base: `/api/v1/admin`
+
+### Admin List
+
+`GET /api/v1/admin/dishes?keyword=&include_inactive=1`
+
+### Admin Detail
+
+`GET /api/v1/admin/dishes/{dish_id}`
+
+### Admin Create
+
+`POST /api/v1/admin/dishes`
+
+```json
+{
+  "name": "番茄炒蛋",
+  "slug": "tomato-scrambled-eggs",
+  "description": "经典家常快手菜",
+  "difficulty": 1,
+  "estimated_total_seconds": 900,
+  "cover_image_url": null,
+  "is_active": true,
+  "category_ids": [1, 2],
+  "ingredients": [
+    { "name": "鸡蛋", "amount": "3个" },
+    { "name": "番茄", "amount": "2个" }
+  ],
+  "steps": [
+    {
+      "title": "准备食材",
+      "instruction": "鸡蛋打散，番茄切块备用",
+      "timer_seconds": 180,
+      "remind_mode": "BOTH"
+    }
+  ]
+}
+```
+
+### Admin Update
+
+`PUT /api/v1/admin/dishes/{dish_id}`
+
+### Admin Set Active
+
+`PATCH /api/v1/admin/dishes/{dish_id}/active`
+
+```json
+{
+  "is_active": false
+}
+```

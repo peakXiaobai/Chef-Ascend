@@ -139,3 +139,23 @@
   - `apps/android-app/app/build.gradle.kts`
 - Follow-up:
   - Add automated API tests for seed-data assertions and Android UI locale regression tests
+
+## 2026-02-24 (Phase 8 - Dish DB Visual Admin Console)
+
+- Owner: Codex
+- Scope:
+  - Added a browser-based dish management console at `/admin/dishes`
+  - Added admin APIs for category list, dish list/detail, create/update, and active-state switching
+  - Added server-side validation and conflict handling for slug uniqueness and invalid category references
+  - Added guarded step update behavior (existing dishes do not allow reducing step count)
+  - Updated project docs with admin entrypoint and API contract
+- Files changed:
+  - `src/modules/admin-dishes/repository.ts`
+  - `src/modules/admin-dishes/service.ts`
+  - `src/modules/admin-dishes/routes.ts`
+  - `src/modules/admin-dishes/ui.ts`
+  - `src/server.ts`
+  - `README.md`
+  - `docs/api/API_V1.md`
+- Follow-up:
+  - Add auth/permission layer for admin console before exposing to public internet

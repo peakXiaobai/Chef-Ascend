@@ -25,6 +25,7 @@ Core product goals:
 - [x] Module 2: Dish detail API (`GET /api/v1/dishes/:dish_id`)
 - [x] Module 3: Cook mode API (`/api/v1/cook-sessions/*`)
 - [x] Module 4: Completion record API (`/api/v1/cook-sessions/:id/complete`, `/api/v1/users/:id/cook-records`)
+- [x] Admin dish management API + web UI (`/admin/dishes`, `/api/v1/admin/*`)
 - [ ] Module 5: Dedicated today count endpoint (optional)
 
 ### Android App Implementation
@@ -96,6 +97,11 @@ Chef-Ascend/
 │   │   │   ├── repository.ts        # cook mode session SQL logic
 │   │   │   ├── routes.ts            # /api/v1/cook-sessions routes
 │   │   │   └── service.ts           # session state machine + redis timer state
+│   │   ├── admin-dishes/
+│   │   │   ├── repository.ts        # dish/category/step admin SQL logic
+│   │   │   ├── routes.ts            # /admin/dishes + /api/v1/admin routes
+│   │   │   ├── service.ts           # admin payload validation + conflict handling
+│   │   │   └── ui.ts                # embedded web console page
 │   │   └── dishes/
 │   │       ├── repository.ts        # catalog SQL query logic
 │   │       ├── routes.ts            # /api/v1/dishes route
@@ -151,6 +157,17 @@ Required env vars:
 - `DATABASE_URL` (for PostgreSQL)
 - `REDIS_URL` (for Redis)
 - `LOG_LEVEL` (recommended `info` in production)
+
+## Dish Admin Console
+
+- Open in browser: `http://localhost:3000/admin/dishes`
+- Core capabilities:
+  - dish list and DB-like visual table
+  - create/edit dish base info
+  - category linking
+  - ingredient and step management
+  - active/inactive switch
+- Current security model: no auth layer yet; deploy behind trusted network or reverse-proxy auth before production internet exposure.
 
 ## Implemented Endpoints
 
