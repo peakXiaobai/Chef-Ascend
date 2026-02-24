@@ -27,6 +27,14 @@ Core product goals:
 - [x] Module 4: Completion record API (`/api/v1/cook-sessions/:id/complete`, `/api/v1/users/:id/cook-records`)
 - [ ] Module 5: Dedicated today count endpoint (optional)
 
+### Android App Implementation
+
+- [x] App scaffold (`Jetpack Compose`)
+- [x] Catalog page
+- [x] Dish detail page
+- [x] Cook mode page (step/timer actions)
+- [x] Completion submit + records page
+
 ## Runtime Architecture
 
 - API service (TypeScript + Fastify)
@@ -41,10 +49,14 @@ Chef-Ascend/
 ├── package.json
 ├── tsconfig.json
 ├── .env.example
+├── apps/
+│   └── android-app/                # native Android client (Jetpack Compose)
 ├── docs/
 │   ├── ARCHITECTURE.md              # system architecture and request flow
 │   ├── COLLABORATION.md             # conventions for multi-model collaboration
 │   ├── DELIVERY_LOG.md              # phase-by-phase delivery report
+│   ├── mobile/
+│   │   └── ANDROID_APP.md           # android app architecture and setup
 │   ├── api/
 │   │   └── API_V1.md                # HTTP contract for 5 core modules
 │   ├── data/
@@ -175,3 +187,4 @@ curl "http://localhost:3000/api/v1/users/1/cook-records?page=1&page_size=20"
 
 1. Module 5: optional dedicated today-count endpoint
 2. Add auth, monitoring, and deployment pipeline
+3. Add Android app login, offline cache, and background timer reminder

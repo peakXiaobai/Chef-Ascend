@@ -103,3 +103,18 @@
   - `docs/modules/04-cook-record.md`
 - Follow-up:
   - Implement optional dedicated today-count endpoint (module 5)
+
+## 2026-02-24 (Phase 6 - Android App MVP)
+
+- Owner: Codex
+- Scope:
+  - Created native Android app project under `apps/android-app` (Kotlin + Jetpack Compose)
+  - Implemented catalog, dish detail, cook mode, completion, and records screens
+  - Integrated Android app with existing backend APIs via Retrofit
+  - Added Android app docs and updated root README structure
+- Files changed:
+  - `apps/android-app/**`
+  - `docs/mobile/ANDROID_APP.md`
+  - `README.md`
+- Follow-up:
+  - Add Android auth flow, offline storage, and background timer notifications
