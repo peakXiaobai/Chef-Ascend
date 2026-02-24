@@ -18,11 +18,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +36,7 @@ import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.UserRecord
 import com.chefascend.mobile.data.repository.ChefRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -41,13 +44,19 @@ fun RecordsScreen(
   repository: ChefRepository,
   onBack: () -> Unit
 ) {
+  val scope = rememberCoroutineScope()
   var loading by remember { mutableStateOf(true) }
+  var refreshing by remember { mutableStateOf(false) }
   var error by remember { mutableStateOf<String?>(null) }
   var records by remember { mutableStateOf<List<UserRecord>>(emptyList()) }
   val errorLoadRecords = stringResource(R.string.error_load_records)
 
-  LaunchedEffect(Unit) {
-    loading = true
+  suspend fun loadRecords(showLoading: Boolean) {
+    if (showLoading) {
+      loading = true
+    } else {
+      refreshing = true
+    }
     error = null
     runCatching {
       withContext(Dispatchers.IO) { repository.getUserRecords(BuildConfig.DEFAULT_USER_ID) }
@@ -56,7 +65,15 @@ fun RecordsScreen(
     }.onFailure {
       error = it.message ?: errorLoadRecords
     }
-    loading = false
+    if (showLoading) {
+      loading = false
+    } else {
+      refreshing = false
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    loadRecords(showLoading = true)
   }
 
   Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.records_title)) }) }) { padding ->
@@ -68,29 +85,43 @@ fun RecordsScreen(
     ) {
       Spacer(modifier = Modifier.height(8.dp))
 
-      when {
-        loading -> {
-          Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-          ) {
-            CircularProgressIndicator()
+      PullToRefreshBox(
+        isRefreshing = refreshing,
+        onRefresh = {
+          if (!loading) {
+            scope.launch {
+              loadRecords(showLoading = false)
+            }
           }
-        }
+        },
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxWidth()
+      ) {
+        when {
+          loading -> {
+            Column(
+              modifier = Modifier.fillMaxSize(),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center
+            ) {
+              CircularProgressIndicator()
+            }
+          }
 
-        error != null -> {
-          Text(error ?: stringResource(R.string.error_generic), color = MaterialTheme.colorScheme.error)
-        }
+          error != null -> {
+            Text(error ?: stringResource(R.string.error_generic), color = MaterialTheme.colorScheme.error)
+          }
 
-        records.isEmpty() -> {
-          Text(stringResource(R.string.records_empty), style = MaterialTheme.typography.bodyLarge)
-        }
+          records.isEmpty() -> {
+            Text(stringResource(R.string.records_empty), style = MaterialTheme.typography.bodyLarge)
+          }
 
-        else -> {
-          LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(records) { record ->
-              RecordCard(record)
+          else -> {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+              items(records) { record ->
+                RecordCard(record)
+              }
             }
           }
         }

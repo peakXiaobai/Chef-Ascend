@@ -28,11 +28,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.DishSummary
 import com.chefascend.mobile.data.repository.ChefRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -52,13 +55,19 @@ fun CatalogScreen(
   onOpenRecords: () -> Unit,
   onOpenSettings: () -> Unit
 ) {
+  val scope = rememberCoroutineScope()
   var loading by remember { mutableStateOf(true) }
+  var refreshing by remember { mutableStateOf(false) }
   var error by remember { mutableStateOf<String?>(null) }
   var dishes by remember { mutableStateOf<List<DishSummary>>(emptyList()) }
   val errorLoadCatalog = stringResource(R.string.error_load_catalog)
 
-  LaunchedEffect(Unit) {
-    loading = true
+  suspend fun loadCatalog(showLoading: Boolean) {
+    if (showLoading) {
+      loading = true
+    } else {
+      refreshing = true
+    }
     error = null
     runCatching {
       withContext(Dispatchers.IO) { repository.getCatalog() }
@@ -67,7 +76,15 @@ fun CatalogScreen(
     }.onFailure {
       error = errorLoadCatalog
     }
-    loading = false
+    if (showLoading) {
+      loading = false
+    } else {
+      refreshing = false
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    loadCatalog(showLoading = true)
   }
 
   Scaffold(
@@ -106,29 +123,43 @@ fun CatalogScreen(
       )
       Spacer(modifier = Modifier.height(12.dp))
 
-      when {
-        loading -> {
-          Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-          ) {
-            CircularProgressIndicator()
+      PullToRefreshBox(
+        isRefreshing = refreshing,
+        onRefresh = {
+          if (!loading) {
+            scope.launch {
+              loadCatalog(showLoading = false)
+            }
           }
-        }
+        },
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxWidth()
+      ) {
+        when {
+          loading -> {
+            Column(
+              modifier = Modifier.fillMaxSize(),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center
+            ) {
+              CircularProgressIndicator()
+            }
+          }
 
-        error != null -> {
-          Text(
-            text = error ?: stringResource(R.string.error_generic),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyLarge
-          )
-        }
+          error != null -> {
+            Text(
+              text = error ?: stringResource(R.string.error_generic),
+              color = MaterialTheme.colorScheme.error,
+              style = MaterialTheme.typography.bodyLarge
+            )
+          }
 
-        else -> {
-          LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(dishes) { dish ->
-              DishCard(dish = dish, onClick = { onDishClick(dish.id) })
+          else -> {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+              items(dishes) { dish ->
+                DishCard(dish = dish, onClick = { onDishClick(dish.id) })
+              }
             }
           }
         }
