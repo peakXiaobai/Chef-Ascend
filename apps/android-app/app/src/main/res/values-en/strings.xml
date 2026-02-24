@@ -32,10 +32,22 @@
     <string name="cook_mode_mark_success">Mark success</string>
     <string name="cook_mode_mark_failed">Mark failed</string>
     <string name="cook_mode_failed_note">Need more practice</string>
+    <string name="cook_mode_helper_name">AI Cooking Buddy</string>
+    <string name="cook_mode_helper_start">Tap buddy to start timer</string>
+    <string name="cook_mode_helper_pause">Tap buddy to pause timer</string>
+    <string name="cook_mode_prev_step">Previous</string>
+    <string name="cook_mode_next_step">Next</string>
+    <string name="cook_mode_finish_early">Finish Early</string>
+    <string name="cook_mode_previewing_step">Previewing step %1$d (current step %2$d)</string>
+    <string name="cook_mode_need_current_step">Return to the current step before completing</string>
+    <string name="cook_mode_finish_ready">Final phase: choose success or failed</string>
 
     <string name="completion_title">Completion</string>
-    <string name="completion_success_message">Great cooking!</string>
+    <string name="completion_success_message">Congratulations, completed!</string>
     <string name="completion_recorded_message">Session saved</string>
+    <string name="completion_failure_message">No worries, this attempt is saved</string>
+    <string name="completion_failure_advice_title">Tips and encouragement</string>
+    <string name="completion_failure_advice_body">1. Read all steps before heating\n2. Keep 20-30s extra buffer per step\n3. You finished this practice, next try will be better!</string>
     <string name="completion_session_id">Session ID: %1$s</string>
     <string name="completion_record_id">Record ID: %1$s</string>
     <string name="completion_result">Result: %1$s</string>

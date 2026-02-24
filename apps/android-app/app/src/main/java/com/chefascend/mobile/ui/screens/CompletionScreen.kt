@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -46,7 +48,7 @@ fun CompletionScreen(
         text = if (result == "SUCCESS") {
           stringResource(R.string.completion_success_message)
         } else {
-          stringResource(R.string.completion_recorded_message)
+          stringResource(R.string.completion_failure_message)
         },
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
@@ -70,6 +72,26 @@ fun CompletionScreen(
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.tertiary
       )
+
+      if (result == "FAILED") {
+        Spacer(modifier = Modifier.height(14.dp))
+        Card(
+          colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        ) {
+          Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+              text = stringResource(R.string.completion_failure_advice_title),
+              style = MaterialTheme.typography.titleMedium,
+              fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+              text = stringResource(R.string.completion_failure_advice_body),
+              style = MaterialTheme.typography.bodyMedium
+            )
+          }
+        }
+      }
 
       Spacer(modifier = Modifier.height(24.dp))
       Button(onClick = onOpenRecords, modifier = Modifier.fillMaxWidth()) {

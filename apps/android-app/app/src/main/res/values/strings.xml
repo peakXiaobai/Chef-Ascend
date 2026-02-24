@@ -32,10 +32,22 @@
     <string name="cook_mode_mark_success">标记成功</string>
     <string name="cook_mode_mark_failed">标记失败</string>
     <string name="cook_mode_failed_note">需要继续练习</string>
+    <string name="cook_mode_helper_name">AI 小厨助手</string>
+    <string name="cook_mode_helper_start">点击小助手开始计时</string>
+    <string name="cook_mode_helper_pause">点击小助手暂停计时</string>
+    <string name="cook_mode_prev_step">上一步</string>
+    <string name="cook_mode_next_step">下一步</string>
+    <string name="cook_mode_finish_early">提前完成</string>
+    <string name="cook_mode_previewing_step">正在浏览第 %1$d 步（当前进行第 %2$d 步）</string>
+    <string name="cook_mode_need_current_step">请先切回当前步骤再完成</string>
+    <string name="cook_mode_finish_ready">收尾阶段：请选择完成或失败</string>
 
     <string name="completion_title">完成记录</string>
-    <string name="completion_success_message">恭喜，完成得很棒！</string>
+    <string name="completion_success_message">恭喜完成！</string>
     <string name="completion_recorded_message">本次记录已保存</string>
+    <string name="completion_failure_message">这次没关系，已为你记录本次尝试</string>
+    <string name="completion_failure_advice_title">建议与鼓励</string>
+    <string name="completion_failure_advice_body">1. 先通读步骤再开火，节奏会更稳\n2. 每步多留 20-30 秒缓冲时间\n3. 你已经完成练习，再来一次会更好，加油！</string>
     <string name="completion_session_id">会话 ID：%1$s</string>
     <string name="completion_record_id">记录 ID：%1$s</string>
     <string name="completion_result">结果：%1$s</string>
