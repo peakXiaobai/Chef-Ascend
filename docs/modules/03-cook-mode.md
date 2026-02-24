@@ -32,3 +32,19 @@ Guide users step by step with timer-aware cooking execution.
 - Step completion must be in order (`step_no` monotonic)
 - Timer state survives brief reconnect via Redis
 - Final session elapsed time stored in PostgreSQL
+
+## Implementation Status
+
+- Status: Implemented (API v1)
+- Routes:
+  - `POST /api/v1/cook-sessions`
+  - `GET /api/v1/cook-sessions/{session_id}`
+  - `POST /api/v1/cook-sessions/{session_id}/steps/{step_no}/start`
+  - `POST /api/v1/cook-sessions/{session_id}/steps/{step_no}/complete`
+  - `POST /api/v1/cook-sessions/{session_id}/timer/pause`
+  - `POST /api/v1/cook-sessions/{session_id}/timer/resume`
+  - `POST /api/v1/cook-sessions/{session_id}/timer/reset`
+- Main files:
+  - `src/modules/cook-sessions/routes.ts`
+  - `src/modules/cook-sessions/service.ts`
+  - `src/modules/cook-sessions/repository.ts`

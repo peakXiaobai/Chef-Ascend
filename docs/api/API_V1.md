@@ -4,7 +4,16 @@ Base path: `/api/v1`
 Content type: `application/json`
 
 Implementation status:
-- Implemented: `GET /dishes`, `GET /dishes/{dish_id}`
+- Implemented:
+  - `GET /dishes`
+  - `GET /dishes/{dish_id}`
+  - `POST /cook-sessions`
+  - `GET /cook-sessions/{session_id}`
+  - `POST /cook-sessions/{session_id}/steps/{step_no}/start`
+  - `POST /cook-sessions/{session_id}/steps/{step_no}/complete`
+  - `POST /cook-sessions/{session_id}/timer/pause`
+  - `POST /cook-sessions/{session_id}/timer/resume`
+  - `POST /cook-sessions/{session_id}/timer/reset`
 - Planned: other endpoints in this document
 
 ## 1) List Dishes

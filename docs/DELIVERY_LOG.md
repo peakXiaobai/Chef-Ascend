@@ -62,3 +62,23 @@
   - `docs/modules/02-dish-detail.md`
 - Follow-up:
   - Implement Module 3 cook session and timer endpoints
+
+## 2026-02-24 (Phase 4 - Module 3)
+
+- Owner: Codex
+- Scope:
+  - Implemented cook session lifecycle endpoints (create/read/start-step/complete-step/timer actions)
+  - Added session state machine logic with strict step-order checks
+  - Added Redis session-state read/write with PostgreSQL fallback for timer baseline
+  - Updated README and API/module docs for module 3
+- Files changed:
+  - `src/modules/cook-sessions/repository.ts`
+  - `src/modules/cook-sessions/service.ts`
+  - `src/modules/cook-sessions/routes.ts`
+  - `src/types/cook-session.ts`
+  - `src/server.ts`
+  - `README.md`
+  - `docs/api/API_V1.md`
+  - `docs/modules/03-cook-mode.md`
+- Follow-up:
+  - Implement Module 4 completion endpoint and user history endpoint

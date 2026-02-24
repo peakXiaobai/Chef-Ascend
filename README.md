@@ -23,7 +23,7 @@ Core product goals:
 
 - [x] Module 1: Catalog API (`GET /api/v1/dishes`)
 - [x] Module 2: Dish detail API (`GET /api/v1/dishes/:dish_id`)
-- [ ] Module 3: Cook mode API
+- [x] Module 3: Cook mode API (`/api/v1/cook-sessions/*`)
 - [ ] Module 4: Completion record API
 - [ ] Module 5: Dedicated today count endpoint (optional)
 
@@ -74,12 +74,18 @@ Chef-Ascend/
 │   │   ├── postgres.ts              # pg connection pool
 │   │   └── redis.ts                 # redis connection helper
 │   ├── modules/
+│   │   ├── cook-sessions/
+│   │   │   ├── repository.ts        # cook mode session SQL logic
+│   │   │   ├── routes.ts            # /api/v1/cook-sessions routes
+│   │   │   └── service.ts           # session state machine + redis timer state
 │   │   └── dishes/
 │   │       ├── repository.ts        # catalog SQL query logic
 │   │       ├── routes.ts            # /api/v1/dishes route
 │   │       └── service.ts           # redis merge + response shaping
 │   ├── types/
-│   │   └── catalog.ts               # catalog domain types
+│   │   ├── catalog.ts               # catalog domain types
+│   │   ├── cook-session.ts          # cook session domain types
+│   │   └── dish-detail.ts           # detail domain types
 │   └── server.ts                    # app bootstrap
 └── scripts/
     ├── init_postgres.sh             # run postgres scripts in order
@@ -140,8 +146,15 @@ Module 2:
 curl "http://localhost:3000/api/v1/dishes/101"
 ```
 
+Module 3:
+
+```bash
+curl -X POST "http://localhost:3000/api/v1/cook-sessions" \
+  -H "content-type: application/json" \
+  -d '{"dish_id":101,"user_id":1}'
+```
+
 ## Next Build Order
 
-1. Module 3: cook session + timer actions
-2. Module 4: complete session + user history
-3. Module 5: optional dedicated today-count endpoint
+1. Module 4: complete session + user history
+2. Module 5: optional dedicated today-count endpoint

@@ -4,6 +4,9 @@ import { env } from "./config/env.js";
 import { createPostgresPool } from "./infrastructure/postgres.js";
 import { createRedisConnection } from "./infrastructure/redis.js";
 import type { RedisClient } from "./infrastructure/redis.js";
+import { CookSessionsRepository } from "./modules/cook-sessions/repository.js";
+import { registerCookSessionRoutes } from "./modules/cook-sessions/routes.js";
+import { CookSessionsService } from "./modules/cook-sessions/service.js";
 import { DishesRepository } from "./modules/dishes/repository.js";
 import { registerDishRoutes } from "./modules/dishes/routes.js";
 import { DishesService } from "./modules/dishes/service.js";
@@ -51,6 +54,10 @@ const bootstrap = async (): Promise<void> => {
   const dishesRepository = new DishesRepository(pool);
   const dishesService = new DishesService(dishesRepository, redisConnection, logger);
   await registerDishRoutes(app, dishesService);
+
+  const cookSessionsRepository = new CookSessionsRepository(pool);
+  const cookSessionsService = new CookSessionsService(cookSessionsRepository, redisConnection, logger);
+  await registerCookSessionRoutes(app, cookSessionsService);
 
   process.on("SIGINT", async () => {
     await shutdown();
