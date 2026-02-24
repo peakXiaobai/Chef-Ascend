@@ -14,6 +14,8 @@ Implementation status:
   - `POST /cook-sessions/{session_id}/timer/pause`
   - `POST /cook-sessions/{session_id}/timer/resume`
   - `POST /cook-sessions/{session_id}/timer/reset`
+  - `POST /cook-sessions/{session_id}/complete`
+  - `GET /users/{user_id}/cook-records`
 - Planned: other endpoints in this document
 
 ## 1) List Dishes

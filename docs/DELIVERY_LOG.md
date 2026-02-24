@@ -82,3 +82,24 @@
   - `docs/modules/03-cook-mode.md`
 - Follow-up:
   - Implement Module 4 completion endpoint and user history endpoint
+
+## 2026-02-24 (Phase 5 - Module 4)
+
+- Owner: Codex
+- Scope:
+  - Implemented completion endpoint with idempotent record insertion (`session_id` unique)
+  - Added session final status transition (`COMPLETED`/`ABANDONED`) on first completion
+  - Implemented user cook record history endpoint with pagination
+  - Added Redis counter increment on new completion with DB fallback for today count
+  - Updated docs and README for module 4 implementation status
+- Files changed:
+  - `src/modules/cook-records/repository.ts`
+  - `src/modules/cook-records/service.ts`
+  - `src/modules/cook-records/routes.ts`
+  - `src/types/cook-record.ts`
+  - `src/server.ts`
+  - `README.md`
+  - `docs/api/API_V1.md`
+  - `docs/modules/04-cook-record.md`
+- Follow-up:
+  - Implement optional dedicated today-count endpoint (module 5)

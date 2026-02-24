@@ -24,7 +24,7 @@ Core product goals:
 - [x] Module 1: Catalog API (`GET /api/v1/dishes`)
 - [x] Module 2: Dish detail API (`GET /api/v1/dishes/:dish_id`)
 - [x] Module 3: Cook mode API (`/api/v1/cook-sessions/*`)
-- [ ] Module 4: Completion record API
+- [x] Module 4: Completion record API (`/api/v1/cook-sessions/:id/complete`, `/api/v1/users/:id/cook-records`)
 - [ ] Module 5: Dedicated today count endpoint (optional)
 
 ## Runtime Architecture
@@ -74,6 +74,10 @@ Chef-Ascend/
 │   │   ├── postgres.ts              # pg connection pool
 │   │   └── redis.ts                 # redis connection helper
 │   ├── modules/
+│   │   ├── cook-records/
+│   │   │   ├── repository.ts        # completion record SQL logic
+│   │   │   ├── routes.ts            # completion and history routes
+│   │   │   └── service.ts           # idempotent completion + redis counter sync
 │   │   ├── cook-sessions/
 │   │   │   ├── repository.ts        # cook mode session SQL logic
 │   │   │   ├── routes.ts            # /api/v1/cook-sessions routes
@@ -84,6 +88,7 @@ Chef-Ascend/
 │   │       └── service.ts           # redis merge + response shaping
 │   ├── types/
 │   │   ├── catalog.ts               # catalog domain types
+│   │   ├── cook-record.ts           # completion record domain types
 │   │   ├── cook-session.ts          # cook session domain types
 │   │   └── dish-detail.ts           # detail domain types
 │   └── server.ts                    # app bootstrap
@@ -154,7 +159,19 @@ curl -X POST "http://localhost:3000/api/v1/cook-sessions" \
   -d '{"dish_id":101,"user_id":1}'
 ```
 
+Module 4:
+
+```bash
+curl -X POST "http://localhost:3000/api/v1/cook-sessions/1/complete" \
+  -H "content-type: application/json" \
+  -d '{"user_id":1,"result":"SUCCESS","rating":5}'
+```
+
+```bash
+curl "http://localhost:3000/api/v1/users/1/cook-records?page=1&page_size=20"
+```
+
 ## Next Build Order
 
-1. Module 4: complete session + user history
-2. Module 5: optional dedicated today-count endpoint
+1. Module 5: optional dedicated today-count endpoint
+2. Add auth, monitoring, and deployment pipeline
