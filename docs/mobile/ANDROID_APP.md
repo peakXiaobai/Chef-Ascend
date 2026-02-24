@@ -31,6 +31,14 @@ Current Android app implementation covers:
 
 Both are currently defined in `apps/android-app/app/build.gradle.kts`.
 
+## Localization
+
+- Default UI language is Simplified Chinese (`values/strings.xml`).
+- English resources live in `values-en/strings.xml`.
+- Users can switch language in app settings:
+  - Catalog top-right gear icon -> Settings -> choose Chinese or English
+- Language preference persists locally and is applied on next launch.
+
 ## Next Improvements
 
 1. Add local persistence (Room) for last used dishes and records

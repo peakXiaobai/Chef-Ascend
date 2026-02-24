@@ -16,12 +16,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,8 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.DishSummary
 import com.chefascend.mobile.data.repository.ChefRepository
 import kotlinx.coroutines.Dispatchers
@@ -45,11 +49,13 @@ import kotlinx.coroutines.withContext
 fun CatalogScreen(
   repository: ChefRepository,
   onDishClick: (dishId: String) -> Unit,
-  onOpenRecords: () -> Unit
+  onOpenRecords: () -> Unit,
+  onOpenSettings: () -> Unit
 ) {
   var loading by remember { mutableStateOf(true) }
   var error by remember { mutableStateOf<String?>(null) }
   var dishes by remember { mutableStateOf<List<DishSummary>>(emptyList()) }
+  val errorLoadCatalog = stringResource(R.string.error_load_catalog)
 
   LaunchedEffect(Unit) {
     loading = true
@@ -59,18 +65,28 @@ fun CatalogScreen(
     }.onSuccess { response ->
       dishes = response.items
     }.onFailure {
-      error = it.message ?: "Failed to load catalog"
+      error = errorLoadCatalog
     }
     loading = false
   }
 
   Scaffold(
     topBar = {
-      TopAppBar(title = { Text("Chef Ascend") })
+      TopAppBar(
+        title = { Text(stringResource(R.string.catalog_title)) },
+        actions = {
+          IconButton(onClick = onOpenSettings) {
+            Icon(
+              imageVector = Icons.Default.Settings,
+              contentDescription = stringResource(R.string.settings_title)
+            )
+          }
+        }
+      )
     },
     floatingActionButton = {
       FloatingActionButton(onClick = onOpenRecords) {
-        Icon(Icons.Default.History, contentDescription = "Open records")
+        Icon(Icons.Default.History, contentDescription = stringResource(R.string.records_title))
       }
     }
   ) { padding ->
@@ -83,7 +99,7 @@ fun CatalogScreen(
     ) {
       Spacer(modifier = Modifier.height(8.dp))
       Text(
-        text = "Today popular dishes",
+        text = stringResource(R.string.catalog_header),
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onBackground,
         fontWeight = FontWeight.Bold
@@ -103,7 +119,7 @@ fun CatalogScreen(
 
         error != null -> {
           Text(
-            text = error ?: "Unknown error",
+            text = error ?: stringResource(R.string.error_generic),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyLarge
           )
@@ -139,19 +155,19 @@ private fun DishCard(dish: DishSummary, onClick: () -> Unit) {
       Spacer(modifier = Modifier.height(8.dp))
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-          text = "Difficulty ${dish.difficulty}",
+          text = stringResource(R.string.catalog_difficulty, dish.difficulty),
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-          text = "${dish.estimated_total_seconds / 60} min",
+          text = stringResource(R.string.catalog_minutes, dish.estimated_total_seconds / 60),
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurface
         )
       }
       Spacer(modifier = Modifier.height(6.dp))
       Text(
-        text = "Today cooked ${dish.today_cook_count} times",
+        text = stringResource(R.string.catalog_today_count, dish.today_cook_count),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.primary
       )

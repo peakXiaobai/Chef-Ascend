@@ -28,9 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.chefascend.mobile.BuildConfig
+import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.DishDetail
 import com.chefascend.mobile.data.model.DishIngredient
 import com.chefascend.mobile.data.model.DishStep
@@ -50,6 +52,10 @@ fun DishDetailScreen(
   var error by remember { mutableStateOf<String?>(null) }
   var creatingSession by remember { mutableStateOf(false) }
 
+  val errorLoadDetail = stringResource(R.string.error_load_detail)
+  val errorStartSession = stringResource(R.string.error_start_session)
+  val errorInvalidDishId = stringResource(R.string.error_invalid_dish_id)
+
   LaunchedEffect(dishId) {
     loading = true
     error = null
@@ -58,12 +64,12 @@ fun DishDetailScreen(
     }.onSuccess {
       detail = it
     }.onFailure {
-      error = it.message ?: "Failed to load dish detail"
+      error = errorLoadDetail
     }
     loading = false
   }
 
-  Scaffold(topBar = { TopAppBar(title = { Text("Dish detail") }) }) { padding ->
+  Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.detail_title)) }) }) { padding ->
     Column(
       modifier = Modifier
         .fillMaxSize()
@@ -84,10 +90,10 @@ fun DishDetailScreen(
         }
 
         error != null -> {
-          Text(text = error ?: "Unknown error", color = MaterialTheme.colorScheme.error)
+          Text(text = error ?: stringResource(R.string.error_generic), color = MaterialTheme.colorScheme.error)
           Spacer(modifier = Modifier.height(12.dp))
           OutlinedButton(onClick = onBack) {
-            Text("Back")
+            Text(stringResource(R.string.common_back))
           }
         }
 
@@ -103,16 +109,20 @@ fun DishDetailScreen(
               )
               Spacer(modifier = Modifier.height(6.dp))
               Text(
-                text = loadedDetail.description ?: "No description",
+                text = loadedDetail.description ?: stringResource(R.string.detail_no_description),
                 style = MaterialTheme.typography.bodyMedium
               )
               Spacer(modifier = Modifier.height(8.dp))
               Text(
-                text = "Difficulty ${loadedDetail.difficulty} | ${loadedDetail.estimated_total_seconds / 60} min",
+                text = stringResource(
+                  R.string.detail_difficulty_minutes,
+                  loadedDetail.difficulty,
+                  loadedDetail.estimated_total_seconds / 60
+                ),
                 style = MaterialTheme.typography.bodyMedium
               )
               Text(
-                text = "Today cooked ${loadedDetail.today_cook_count} times",
+                text = stringResource(R.string.catalog_today_count, loadedDetail.today_cook_count),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodySmall
               )
@@ -127,7 +137,7 @@ fun DishDetailScreen(
             }
 
             item {
-              SectionTitle("Ingredients")
+              SectionTitle(stringResource(R.string.detail_ingredients_title))
             }
 
             items(loadedDetail.ingredients) { ingredient ->
@@ -135,7 +145,7 @@ fun DishDetailScreen(
             }
 
             item {
-              SectionTitle("Steps")
+              SectionTitle(stringResource(R.string.detail_steps_title))
             }
 
             items(loadedDetail.steps) { step ->
@@ -155,11 +165,17 @@ fun DishDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !creatingSession
               ) {
-                Text(if (creatingSession) "Starting..." else "Start cooking")
+                Text(
+                  if (creatingSession) {
+                    stringResource(R.string.detail_starting)
+                  } else {
+                    stringResource(R.string.detail_start_cooking)
+                  }
+                )
               }
               Spacer(modifier = Modifier.height(6.dp))
               OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-                Text("Back")
+                Text(stringResource(R.string.common_back))
               }
               Spacer(modifier = Modifier.height(16.dp))
             }
@@ -169,18 +185,16 @@ fun DishDetailScreen(
             LaunchedEffect(creatingSession) {
               runCatching {
                 withContext(Dispatchers.IO) {
-                  if (numericDishId == null) {
-                    error("Invalid dish id")
-                  }
+                  val selectedDishId = numericDishId ?: error(errorInvalidDishId)
                   repository.startSession(
-                    dishId = numericDishId,
+                    dishId = selectedDishId,
                     userId = BuildConfig.DEFAULT_USER_ID
                   )
                 }
               }.onSuccess { session ->
                 onStartCooking(loadedDetail.id, session.session_id)
               }.onFailure {
-                error = it.message ?: "Failed to start cooking session"
+                error = errorStartSession
               }
               creatingSession = false
             }
@@ -216,13 +230,13 @@ private fun StepRow(step: DishStep) {
       .padding(vertical = 4.dp)
   ) {
     Text(
-      text = "Step ${step.step_no}: ${step.title}",
+      text = stringResource(R.string.detail_step_title, step.step_no, step.title),
       style = MaterialTheme.typography.bodyLarge,
       fontWeight = FontWeight.Medium
     )
     Text(text = step.instruction, style = MaterialTheme.typography.bodyMedium)
     Text(
-      text = "Timer ${step.timer_seconds}s | Reminder ${step.remind_mode}",
+      text = stringResource(R.string.detail_step_timer_mode, step.timer_seconds, step.remind_mode),
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.primary
     )

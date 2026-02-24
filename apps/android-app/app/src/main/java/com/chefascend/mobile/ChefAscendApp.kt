@@ -15,6 +15,7 @@ import com.chefascend.mobile.ui.screens.CookModeScreen
 import com.chefascend.mobile.ui.screens.DishDetailScreen
 import com.chefascend.mobile.ui.screens.RecordsScreen
 import com.chefascend.mobile.ui.screens.ScreenRoutes
+import com.chefascend.mobile.ui.screens.SettingsScreen
 
 @Composable
 fun ChefAscendApp() {
@@ -26,7 +27,8 @@ fun ChefAscendApp() {
       CatalogScreen(
         repository = repository,
         onDishClick = { dishId -> navController.navigate(ScreenRoutes.Detail.create(dishId)) },
-        onOpenRecords = { navController.navigate(ScreenRoutes.Records.route) }
+        onOpenRecords = { navController.navigate(ScreenRoutes.Records.route) },
+        onOpenSettings = { navController.navigate(ScreenRoutes.Settings.route) }
       )
     }
 
@@ -105,6 +107,10 @@ fun ChefAscendApp() {
         repository = repository,
         onBack = { navController.popBackStack() }
       )
+    }
+
+    composable(ScreenRoutes.Settings.route) {
+      SettingsScreen(onBack = { navController.popBackStack() })
     }
   }
 }

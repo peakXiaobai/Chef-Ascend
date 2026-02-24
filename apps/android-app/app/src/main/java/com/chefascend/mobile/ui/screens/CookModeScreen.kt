@@ -37,9 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.chefascend.mobile.BuildConfig
+import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.DishDetail
 import com.chefascend.mobile.data.model.SessionState
 import com.chefascend.mobile.data.repository.ChefRepository
@@ -75,6 +77,15 @@ fun CookModeScreen(
   var remainingSeconds by remember { mutableIntStateOf(0) }
   var isPaused by remember { mutableStateOf(true) }
   var timerJob by remember { mutableStateOf<Job?>(null) }
+
+  val errorLoadCookMode = stringResource(R.string.error_load_cook_mode)
+  val errorStartStep = stringResource(R.string.error_start_step)
+  val errorCompleteStep = stringResource(R.string.error_complete_step)
+  val errorPauseTimer = stringResource(R.string.error_pause_timer)
+  val errorResumeTimer = stringResource(R.string.error_resume_timer)
+  val errorResetTimer = stringResource(R.string.error_reset_timer)
+  val errorFinishSession = stringResource(R.string.error_finish_session)
+  val failedNote = stringResource(R.string.cook_mode_failed_note)
 
   fun stopCountdown() {
     timerJob?.cancel()
@@ -138,7 +149,7 @@ fun CookModeScreen(
         startCountdown()
       }
     }.onFailure {
-      error = it.message ?: "Failed to load cooking mode"
+      error = errorLoadCookMode
     }
     loading = false
   }
@@ -147,7 +158,7 @@ fun CookModeScreen(
     onDispose { stopCountdown() }
   }
 
-  Scaffold(topBar = { TopAppBar(title = { Text("Cook mode") }) }) { padding ->
+  Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.cook_mode_title)) }) }) { padding ->
     Column(
       modifier = Modifier
         .fillMaxSize()
@@ -170,10 +181,10 @@ fun CookModeScreen(
         }
 
         error != null -> {
-          Text(error ?: "Unknown error", color = MaterialTheme.colorScheme.error)
+          Text(error ?: stringResource(R.string.error_generic), color = MaterialTheme.colorScheme.error)
           Spacer(modifier = Modifier.height(12.dp))
           OutlinedButton(onClick = onBack) {
-            Text("Back")
+            Text(stringResource(R.string.common_back))
           }
         }
 
@@ -188,19 +199,23 @@ fun CookModeScreen(
           )
           Spacer(modifier = Modifier.height(8.dp))
           Text(
-            text = "Session #$sessionId | Status ${session?.status}",
+            text = stringResource(
+              R.string.cook_mode_session_status,
+              sessionId,
+              sessionStatusLabel(session?.status)
+            ),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
           )
           Spacer(modifier = Modifier.height(14.dp))
 
           Text(
-            text = "Step $currentStepNo",
+            text = stringResource(R.string.cook_mode_step_no, currentStepNo),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold
           )
           Text(
-            text = currentStep?.title ?: "No step information",
+            text = currentStep?.title ?: stringResource(R.string.cook_mode_no_step_info),
             style = MaterialTheme.typography.titleMedium
           )
           Spacer(modifier = Modifier.height(6.dp))
@@ -218,7 +233,11 @@ fun CookModeScreen(
           )
 
           Text(
-            text = if (isPaused) "Paused" else "Running",
+            text = if (isPaused) {
+              stringResource(R.string.cook_mode_paused)
+            } else {
+              stringResource(R.string.cook_mode_running)
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
           )
@@ -235,13 +254,13 @@ fun CookModeScreen(
                     withContext(Dispatchers.IO) { repository.startStep(sessionId, currentStepNo) }
                     refreshState()
                   }.onFailure {
-                    error = it.message ?: "Failed to start step"
+                    error = errorStartStep
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Start step")
+              Text(stringResource(R.string.cook_mode_start_step))
             }
 
             Button(
@@ -251,13 +270,13 @@ fun CookModeScreen(
                     withContext(Dispatchers.IO) { repository.completeStep(sessionId, currentStepNo) }
                     refreshState()
                   }.onFailure {
-                    error = it.message ?: "Failed to complete step"
+                    error = errorCompleteStep
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Complete step")
+              Text(stringResource(R.string.cook_mode_complete_step))
             }
           }
 
@@ -273,13 +292,13 @@ fun CookModeScreen(
                     withContext(Dispatchers.IO) { repository.pauseTimer(sessionId) }
                     refreshState()
                   }.onFailure {
-                    error = it.message ?: "Failed to pause timer"
+                    error = errorPauseTimer
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Pause")
+              Text(stringResource(R.string.cook_mode_pause))
             }
 
             OutlinedButton(
@@ -289,13 +308,13 @@ fun CookModeScreen(
                     withContext(Dispatchers.IO) { repository.resumeTimer(sessionId) }
                     refreshState()
                   }.onFailure {
-                    error = it.message ?: "Failed to resume timer"
+                    error = errorResumeTimer
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Resume")
+              Text(stringResource(R.string.cook_mode_resume))
             }
 
             OutlinedButton(
@@ -305,19 +324,19 @@ fun CookModeScreen(
                     withContext(Dispatchers.IO) { repository.resetTimer(sessionId) }
                     refreshState()
                   }.onFailure {
-                    error = it.message ?: "Failed to reset timer"
+                    error = errorResetTimer
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Reset")
+              Text(stringResource(R.string.cook_mode_reset))
             }
           }
 
           Spacer(modifier = Modifier.height(18.dp))
           Text(
-            text = "Finish this dish",
+            text = stringResource(R.string.cook_mode_finish_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
           )
@@ -350,13 +369,13 @@ fun CookModeScreen(
                       )
                     )
                   }.onFailure {
-                    error = it.message ?: "Failed to finish session"
+                    error = errorFinishSession
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Mark success")
+              Text(stringResource(R.string.cook_mode_mark_success))
             }
 
             OutlinedButton(
@@ -368,7 +387,7 @@ fun CookModeScreen(
                         sessionId = sessionId,
                         userId = BuildConfig.DEFAULT_USER_ID,
                         result = "FAILED",
-                        note = "Need more practice"
+                        note = failedNote
                       )
                     }
                   }.onSuccess { response ->
@@ -382,23 +401,33 @@ fun CookModeScreen(
                       )
                     )
                   }.onFailure {
-                    error = it.message ?: "Failed to finish session"
+                    error = errorFinishSession
                   }
                 }
               },
               modifier = Modifier.weight(1f)
             ) {
-              Text("Mark failed")
+              Text(stringResource(R.string.cook_mode_mark_failed))
             }
           }
 
           Spacer(modifier = Modifier.height(12.dp))
           OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-            Text("Back")
+            Text(stringResource(R.string.common_back))
           }
           Spacer(modifier = Modifier.height(18.dp))
         }
       }
     }
+  }
+}
+
+@Composable
+private fun sessionStatusLabel(status: String?): String {
+  return when (status) {
+    "IN_PROGRESS" -> stringResource(R.string.status_in_progress)
+    "COMPLETED" -> stringResource(R.string.status_completed)
+    "ABANDONED" -> stringResource(R.string.status_abandoned)
+    else -> status ?: "-"
   }
 }

@@ -17,9 +17,11 @@ import { DishesRepository } from "./modules/dishes/repository.js";
 import { registerDishRoutes } from "./modules/dishes/routes.js";
 import { DishesService } from "./modules/dishes/service.js";
 
+const logLevel = env.LOG_LEVEL ?? (env.NODE_ENV === "development" ? "debug" : "info");
+
 const app = Fastify({
   logger: {
-    level: env.NODE_ENV === "development" ? "info" : "warn"
+    level: logLevel
   }
 });
 
@@ -55,6 +57,20 @@ const bootstrap = async (): Promise<void> => {
       status: "ok",
       redis: redisConnection ? "connected" : "disabled_or_unavailable"
     };
+  });
+
+  app.addHook("onResponse", (request, reply, done) => {
+    request.log.info(
+      {
+        method: request.method,
+        url: request.url,
+        statusCode: reply.statusCode,
+        responseTimeMs: Number(reply.elapsedTime.toFixed(2)),
+        remoteAddress: request.ip
+      },
+      "access"
+    );
+    done();
   });
 
   app.get("/downloads/:filename", async (request, reply) => {

@@ -34,6 +34,7 @@ Core product goals:
 - [x] Dish detail page
 - [x] Cook mode page (step/timer actions)
 - [x] Completion submit + records page
+- [x] Settings page with Chinese/English language switch (default Chinese)
 
 ## Runtime Architecture
 
@@ -74,6 +75,7 @@ Chef-Ascend/
 │   │   ├── 002_views_and_indexes.sql# views and indexes
 │   │   ├── 003_seed_demo.sql        # optional seed data
 │   │   ├── 004_rebuild_daily_stats.sql # rebuild daily stats from records
+│   │   ├── 005_seed_feature_data.sql # module-level test data
 │   │   └── README.md                # db init/run guide
 │   └── redis/
 │       ├── 001_key_design.md        # redis key conventions
@@ -148,6 +150,7 @@ bash scripts/init_redis.sh
 Required env vars:
 - `DATABASE_URL` (for PostgreSQL)
 - `REDIS_URL` (for Redis)
+- `LOG_LEVEL` (recommended `info` in production)
 
 ## Implemented Endpoints
 

@@ -118,3 +118,24 @@
   - `README.md`
 - Follow-up:
   - Add Android auth flow, offline storage, and background timer notifications
+
+## 2026-02-24 (Phase 7 - Access Logs + Seed Data + CN/EN i18n)
+
+- Owner: Codex
+- Scope:
+  - Added configurable API access logs (`LOG_LEVEL`) with per-request method, path, status, latency, and IP
+  - Added `005_seed_feature_data.sql` to seed end-to-end test data for catalog/detail/cook/completion/records/today-count flows
+  - Updated PostgreSQL init script and DB docs to include the new feature seed script
+  - Switched Android app to Simplified Chinese default UI with in-app language switch (Chinese/English) in settings
+  - Localized catalog/detail/cook/completion/records/settings screens and string resources
+- Files changed:
+  - `src/server.ts`
+  - `src/config/env.ts`
+  - `.env.example`
+  - `database/postgres/005_seed_feature_data.sql`
+  - `scripts/init_postgres.sh`
+  - `database/postgres/README.md`
+  - `apps/android-app/app/src/main/**`
+  - `apps/android-app/app/build.gradle.kts`
+- Follow-up:
+  - Add automated API tests for seed-data assertions and Android UI locale regression tests

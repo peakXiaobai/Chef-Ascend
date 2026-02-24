@@ -26,9 +26,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.chefascend.mobile.BuildConfig
+import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.UserRecord
 import com.chefascend.mobile.data.repository.ChefRepository
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,7 @@ fun RecordsScreen(
   var loading by remember { mutableStateOf(true) }
   var error by remember { mutableStateOf<String?>(null) }
   var records by remember { mutableStateOf<List<UserRecord>>(emptyList()) }
+  val errorLoadRecords = stringResource(R.string.error_load_records)
 
   LaunchedEffect(Unit) {
     loading = true
@@ -51,12 +54,12 @@ fun RecordsScreen(
     }.onSuccess {
       records = it.items
     }.onFailure {
-      error = it.message ?: "Failed to load records"
+      error = it.message ?: errorLoadRecords
     }
     loading = false
   }
 
-  Scaffold(topBar = { TopAppBar(title = { Text("My cook records") }) }) { padding ->
+  Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.records_title)) }) }) { padding ->
     Column(
       modifier = Modifier
         .fillMaxSize()
@@ -77,11 +80,11 @@ fun RecordsScreen(
         }
 
         error != null -> {
-          Text(error ?: "Unknown error", color = MaterialTheme.colorScheme.error)
+          Text(error ?: stringResource(R.string.error_generic), color = MaterialTheme.colorScheme.error)
         }
 
         records.isEmpty() -> {
-          Text("No records yet", style = MaterialTheme.typography.bodyLarge)
+          Text(stringResource(R.string.records_empty), style = MaterialTheme.typography.bodyLarge)
         }
 
         else -> {
@@ -95,7 +98,7 @@ fun RecordsScreen(
 
       Spacer(modifier = Modifier.height(10.dp))
       OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-        Text("Back")
+        Text(stringResource(R.string.common_back))
       }
       Spacer(modifier = Modifier.height(10.dp))
     }
@@ -111,13 +114,26 @@ private fun RecordCard(record: UserRecord) {
   ) {
     Text(record.dish_name, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
     Text(
-      text = "Result: ${record.result}  Rating: ${record.rating ?: "-"}",
+      text = stringResource(
+        R.string.records_result_rating,
+        resultLabel(record.result),
+        record.rating?.toString() ?: stringResource(R.string.records_rating_none)
+      ),
       style = MaterialTheme.typography.bodyMedium
     )
     Text(
-      text = "Cooked at: ${record.cooked_at}",
+      text = stringResource(R.string.records_cooked_at, record.cooked_at),
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.primary
     )
+  }
+}
+
+@Composable
+private fun resultLabel(result: String): String {
+  return when (result) {
+    "SUCCESS" -> stringResource(R.string.result_success)
+    "FAILED" -> stringResource(R.string.result_failed)
+    else -> result
   }
 }

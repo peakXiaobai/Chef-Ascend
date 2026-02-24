@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">Chef Ascend</string>
+
+    <string name="catalog_title">Dish Catalog</string>
+    <string name="catalog_header">What do you want to cook today?</string>
+    <string name="catalog_difficulty">Difficulty %1$d</string>
+    <string name="catalog_minutes">About %1$d min</string>
+    <string name="catalog_today_count">Cooked by %1$d people today</string>
+
+    <string name="detail_title">Dish Detail</string>
+    <string name="detail_no_description">No description available</string>
+    <string name="detail_difficulty_minutes">Difficulty %1$d · %2$d min</string>
+    <string name="detail_ingredients_title">Ingredients</string>
+    <string name="detail_steps_title">Steps</string>
+    <string name="detail_step_title">Step %1$d: %2$s</string>
+    <string name="detail_step_timer_mode">Timer %1$d sec · Reminder: %2$s</string>
+    <string name="detail_start_cooking">Start cooking</string>
+    <string name="detail_starting">Starting session...</string>
+
+    <string name="cook_mode_title">Cook Mode</string>
+    <string name="cook_mode_session_status">Session %1$s · Status: %2$s</string>
+    <string name="cook_mode_step_no">Current step: %1$d</string>
+    <string name="cook_mode_no_step_info">No step info</string>
+    <string name="cook_mode_paused">Timer paused</string>
+    <string name="cook_mode_running">Timer running</string>
+    <string name="cook_mode_start_step">Start step</string>
+    <string name="cook_mode_complete_step">Complete step</string>
+    <string name="cook_mode_pause">Pause</string>
+    <string name="cook_mode_resume">Resume</string>
+    <string name="cook_mode_reset">Reset</string>
+    <string name="cook_mode_finish_title">Finish this session</string>
+    <string name="cook_mode_mark_success">Mark success</string>
+    <string name="cook_mode_mark_failed">Mark failed</string>
+    <string name="cook_mode_failed_note">Need more practice</string>
+
+    <string name="completion_title">Completion</string>
+    <string name="completion_success_message">Great cooking!</string>
+    <string name="completion_recorded_message">Session saved</string>
+    <string name="completion_session_id">Session ID: %1$s</string>
+    <string name="completion_record_id">Record ID: %1$s</string>
+    <string name="completion_result">Result: %1$s</string>
+    <string name="completion_today_count">Today cooked count: %1$d</string>
+    <string name="completion_view_records">View my records</string>
+    <string name="completion_back_catalog">Back to catalog</string>
+
+    <string name="records_title">My Records</string>
+    <string name="records_empty">No records yet</string>
+    <string name="records_result_rating">Result: %1$s   Rating: %2$s</string>
+    <string name="records_rating_none">-</string>
+    <string name="records_cooked_at">Cooked at: %1$s</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_current_zh">Current language: Simplified Chinese</string>
+    <string name="settings_language_current_en">Current language: English</string>
+    <string name="settings_language_zh">Switch to Simplified Chinese</string>
+    <string name="settings_language_en">Switch to English</string>
+
+    <string name="common_back">Back</string>
+
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_abandoned">Abandoned</string>
+    <string name="result_success">Success</string>
+    <string name="result_failed">Failed</string>
+
+    <string name="error_generic">Something went wrong, please try again.</string>
+    <string name="error_load_catalog">Failed to load dish catalog</string>
+    <string name="error_load_detail">Failed to load dish detail</string>
+    <string name="error_start_session">Failed to start cooking session</string>
+    <string name="error_invalid_dish_id">Invalid dish ID</string>
+    <string name="error_load_cook_mode">Failed to load cook mode</string>
+    <string name="error_start_step">Failed to start step</string>
+    <string name="error_complete_step">Failed to complete step</string>
+    <string name="error_pause_timer">Failed to pause timer</string>
+    <string name="error_resume_timer">Failed to resume timer</string>
+    <string name="error_reset_timer">Failed to reset timer</string>
+    <string name="error_finish_session">Failed to finish session</string>
+    <string name="error_load_records">Failed to load records</string>
+</resources>

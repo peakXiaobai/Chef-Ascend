@@ -11,6 +11,7 @@ psql "$DATABASE_URL" -f database/postgres/002_views_and_indexes.sql
 
 if [[ "${SKIP_SEED:-0}" != "1" ]]; then
   psql "$DATABASE_URL" -f database/postgres/003_seed_demo.sql
+  psql "$DATABASE_URL" -f database/postgres/005_seed_feature_data.sql
 fi
 
 if [[ "${REBUILD_DAILY_STATS:-0}" == "1" ]]; then
