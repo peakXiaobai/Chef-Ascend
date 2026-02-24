@@ -14,6 +14,63 @@ WHERE NOT EXISTS (
   WHERE u.nickname = v.nickname
 );
 
+-- Normalize demo dish copy to Chinese so the app defaults to Chinese-facing content.
+UPDATE dishes
+SET
+  name = '番茄炒蛋',
+  description = '经典家常快手菜，步骤简单，适合新手练习。',
+  ingredients_json = '[{"name":"鸡蛋","amount":"3个"},{"name":"番茄","amount":"2个"},{"name":"盐","amount":"3克"}]'::jsonb
+WHERE slug = 'tomato-scrambled-eggs';
+
+UPDATE dishes
+SET
+  name = '手撕包菜',
+  description = '家常下饭菜，火候易掌握，适合计时练习。',
+  ingredients_json = '[{"name":"包菜","amount":"300克"},{"name":"蒜瓣","amount":"2瓣"},{"name":"生抽","amount":"8毫升"}]'::jsonb
+WHERE slug = 'stir-fried-cabbage';
+
+UPDATE dish_steps
+SET
+  title = CASE step_no
+    WHEN 1 THEN '准备食材'
+    WHEN 2 THEN '煎蛋'
+    WHEN 3 THEN '炒番茄并合炒'
+    ELSE title
+  END,
+  instruction = CASE step_no
+    WHEN 1 THEN '鸡蛋打散，番茄切块备用。'
+    WHEN 2 THEN '热锅下油，倒入蛋液快速翻炒至八成熟后盛出。'
+    WHEN 3 THEN '下番茄炒软出汁，倒回鸡蛋，加盐翻匀即可。'
+    ELSE instruction
+  END
+WHERE dish_id = (
+  SELECT id
+  FROM dishes
+  WHERE slug = 'tomato-scrambled-eggs'
+  LIMIT 1
+);
+
+UPDATE dish_steps
+SET
+  title = CASE step_no
+    WHEN 1 THEN '处理包菜'
+    WHEN 2 THEN '爆香蒜末'
+    WHEN 3 THEN '大火翻炒包菜'
+    ELSE title
+  END,
+  instruction = CASE step_no
+    WHEN 1 THEN '包菜清洗后手撕成小块并沥干水分。'
+    WHEN 2 THEN '热油后下蒜末，小火炒出香味。'
+    WHEN 3 THEN '转大火下包菜快速翻炒至断生，调味出锅。'
+    ELSE instruction
+  END
+WHERE dish_id = (
+  SELECT id
+  FROM dishes
+  WHERE slug = 'stir-fried-cabbage'
+  LIMIT 1
+);
+
 -- Seed one in-progress session for cook mode testing.
 WITH target_dish AS (
   SELECT id AS dish_id
