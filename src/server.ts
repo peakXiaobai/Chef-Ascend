@@ -1,4 +1,7 @@
 import Fastify from "fastify";
+import { createReadStream } from "node:fs";
+import { access } from "node:fs/promises";
+import path from "node:path";
 
 import { env } from "./config/env.js";
 import { createPostgresPool } from "./infrastructure/postgres.js";
@@ -52,6 +55,25 @@ const bootstrap = async (): Promise<void> => {
       status: "ok",
       redis: redisConnection ? "connected" : "disabled_or_unavailable"
     };
+  });
+
+  app.get("/downloads/:filename", async (request, reply) => {
+    const params = request.params as { filename?: string };
+    const filename = params.filename ?? "";
+    if (!/^[A-Za-z0-9._-]+$/.test(filename)) {
+      return reply.code(400).send({ message: "Invalid filename" });
+    }
+
+    const filePath = path.join(process.cwd(), "releases", filename);
+    try {
+      await access(filePath);
+    } catch {
+      return reply.code(404).send({ message: "File not found" });
+    }
+
+    reply.header("Content-Type", "application/vnd.android.package-archive");
+    reply.header("Content-Disposition", `attachment; filename=\"${filename}\"`);
+    return reply.send(createReadStream(filePath));
   });
 
   const dishesRepository = new DishesRepository(pool);
