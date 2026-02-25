@@ -275,3 +275,17 @@
   - `README.md`
 - Follow-up:
   - Let `happy-app` assistant execute the handoff doc and report the resulting `latest.json` + APK URL
+
+## 2026-02-25 (Phase 15 - Temporary Update Detection Build)
+
+- Owner: Codex
+- Scope:
+  - Added a temporary detectable Android update build for Chef (`0.5.1`, `versionCode=6`)
+  - Prepared this build for user-side update detection/validation flow
+- Files changed:
+  - `apps/android-app/app/build.gradle.kts`
+  - `src/config/env.ts`
+  - `.env.example`
+  - `docs/DELIVERY_LOG.md`
+- Follow-up:
+  - Remove temporary detection capability after user confirms update path
