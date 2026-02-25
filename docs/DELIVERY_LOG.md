@@ -224,3 +224,21 @@
   - `docs/mobile/ANDROID_APP.md`
 - Follow-up:
   - Rebuild APK and verify settings page no longer crashes on locale actions
+
+## 2026-02-25 (Phase 12 - Update Progress Telemetry)
+
+- Owner: Codex
+- Scope:
+  - Added realtime APK download speed display in Android settings update UI
+  - Added downloaded bytes / total bytes progress text and faster polling cadence
+  - Updated download endpoint response headers with `Content-Length` and `Accept-Ranges`
+  - Bumped Android version for upgrade detection (`0.5.0`, `versionCode=5`)
+- Files changed:
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/screens/SettingsScreen.kt`
+  - `apps/android-app/app/src/main/res/values/strings.xml`
+  - `apps/android-app/app/build.gradle.kts`
+  - `src/server.ts`
+  - `src/config/env.ts`
+  - `.env.example`
+- Follow-up:
+  - Verify end-device behavior on both high-bandwidth and weak-network conditions

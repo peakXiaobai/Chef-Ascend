@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import { createReadStream } from "node:fs";
-import { access, stat } from "node:fs/promises";
+import { stat } from "node:fs/promises";
 import path from "node:path";
 
 import { env } from "./config/env.js";
@@ -92,14 +92,17 @@ const bootstrap = async (): Promise<void> => {
     }
 
     const filePath = getReleaseFilePath(filename);
+    let fileStat: Awaited<ReturnType<typeof stat>>;
     try {
-      await access(filePath);
+      fileStat = await stat(filePath);
     } catch {
       return reply.code(404).send({ message: "File not found" });
     }
 
     reply.header("Content-Type", "application/vnd.android.package-archive");
     reply.header("Content-Disposition", `attachment; filename=\"${filename}\"`);
+    reply.header("Content-Length", fileStat.size.toString());
+    reply.header("Accept-Ranges", "bytes");
     return reply.send(createReadStream(filePath));
   });
 

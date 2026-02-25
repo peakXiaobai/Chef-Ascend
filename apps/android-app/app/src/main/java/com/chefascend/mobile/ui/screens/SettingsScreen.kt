@@ -67,6 +67,9 @@ fun SettingsScreen(
   var updateMessage by remember { mutableStateOf<String?>(null) }
   var activeDownloadId by remember { mutableLongStateOf(-1L) }
   var downloadProgress by remember { mutableFloatStateOf(0f) }
+  var downloadBytesDone by remember { mutableLongStateOf(0L) }
+  var downloadBytesTotal by remember { mutableLongStateOf(0L) }
+  var downloadSpeedBytesPerSecond by remember { mutableLongStateOf(0L) }
 
   val isDownloading = activeDownloadId > 0L
 
@@ -86,6 +89,9 @@ fun SettingsScreen(
           val result = withContext(Dispatchers.IO) { resolveDownloadResult(appContext, downloadId) }
           activeDownloadId = -1L
           downloadProgress = 0f
+          downloadBytesDone = 0L
+          downloadBytesTotal = 0L
+          downloadSpeedBytesPerSecond = 0L
           if (result.status == DownloadStatus.Success && result.uri != null) {
             val launched = launchInstallIntent(appContext, result.uri)
             updateMessage = if (launched) {
@@ -226,13 +232,21 @@ fun SettingsScreen(
 
             activeDownloadId = downloadId
             downloadProgress = 0f
+            downloadBytesDone = 0L
+            downloadBytesTotal = 0L
+            downloadSpeedBytesPerSecond = 0L
             updateMessage = context.getString(R.string.settings_update_downloading)
 
             scope.launch {
               trackDownloadProgress(
                 context = appContext,
                 downloadId = downloadId,
-                onProgress = { progress -> downloadProgress = progress }
+                onProgress = { track ->
+                  downloadProgress = track.progress
+                  downloadBytesDone = track.downloadedBytes
+                  downloadBytesTotal = track.totalBytes
+                  downloadSpeedBytesPerSecond = track.speedBytesPerSecond
+                }
               )
             }
           },
@@ -245,15 +259,36 @@ fun SettingsScreen(
 
       if (isDownloading) {
         Spacer(modifier = Modifier.height(10.dp))
-        LinearProgressIndicator(
-          progress = { downloadProgress },
-          modifier = Modifier.fillMaxWidth()
-        )
+        if (downloadBytesTotal > 0L) {
+          LinearProgressIndicator(
+            progress = { downloadProgress },
+            modifier = Modifier.fillMaxWidth()
+          )
+        } else {
+          LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
+          text = if (downloadBytesTotal > 0L) {
+            stringResource(
+              R.string.settings_update_progress_detail,
+              (downloadProgress * 100).toInt().coerceIn(0, 100),
+              formatFileSize(downloadBytesDone),
+              formatFileSize(downloadBytesTotal)
+            )
+          } else {
+            stringResource(
+              R.string.settings_update_progress_unknown_total,
+              formatFileSize(downloadBytesDone)
+            )
+          },
+          style = MaterialTheme.typography.bodySmall
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
           text = stringResource(
-            R.string.settings_update_progress,
-            (downloadProgress * 100).toInt().coerceIn(0, 100)
+            R.string.settings_update_speed,
+            formatSpeed(downloadSpeedBytesPerSecond)
           ),
           style = MaterialTheme.typography.bodySmall
         )
@@ -296,14 +331,24 @@ private fun startApkDownload(context: Context, latest: AndroidReleaseInfo): Long
 private suspend fun trackDownloadProgress(
   context: Context,
   downloadId: Long,
-  onProgress: (Float) -> Unit
+  onProgress: (DownloadTrack) -> Unit
 ) {
   val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+  var lastBytes = -1L
+  var lastTimestampMs = 0L
+
   while (true) {
+    val nowMs = System.currentTimeMillis()
     val query = DownloadManager.Query().setFilterById(downloadId)
     val result = manager.query(query).use { cursor ->
       if (!cursor.moveToFirst()) {
-        DownloadTrack(status = DownloadManager.STATUS_FAILED, progress = 0f)
+        DownloadTrack(
+          status = DownloadManager.STATUS_FAILED,
+          progress = 0f,
+          downloadedBytes = 0L,
+          totalBytes = 0L,
+          speedBytesPerSecond = 0L
+        )
       } else {
         val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
         val downloaded = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
@@ -313,15 +358,36 @@ private suspend fun trackDownloadProgress(
         } else {
           0f
         }
-        DownloadTrack(status = status, progress = progress)
+        DownloadTrack(
+          status = status,
+          progress = progress,
+          downloadedBytes = downloaded.coerceAtLeast(0L),
+          totalBytes = total.coerceAtLeast(0L),
+          speedBytesPerSecond = 0L
+        )
       }
     }
 
-    onProgress(result.progress)
+    val speedBytesPerSecond = if (
+      result.status == DownloadManager.STATUS_RUNNING &&
+      lastBytes >= 0 &&
+      nowMs > lastTimestampMs &&
+      result.downloadedBytes >= lastBytes
+    ) {
+      ((result.downloadedBytes - lastBytes) * 1000L / (nowMs - lastTimestampMs)).coerceAtLeast(0L)
+    } else {
+      0L
+    }
+
+    onProgress(result.copy(speedBytesPerSecond = speedBytesPerSecond))
+
+    lastBytes = result.downloadedBytes
+    lastTimestampMs = nowMs
+
     if (result.status == DownloadManager.STATUS_SUCCESSFUL || result.status == DownloadManager.STATUS_FAILED) {
       return
     }
-    delay(600)
+    delay(200)
   }
 }
 
@@ -378,9 +444,19 @@ private fun formatFileSize(bytes: Long): String {
   }
 }
 
+private fun formatSpeed(bytesPerSecond: Long): String {
+  if (bytesPerSecond <= 0L) {
+    return "0 B/s"
+  }
+  return "${formatFileSize(bytesPerSecond)}/s"
+}
+
 private data class DownloadTrack(
   val status: Int,
-  val progress: Float
+  val progress: Float,
+  val downloadedBytes: Long,
+  val totalBytes: Long,
+  val speedBytesPerSecond: Long
 )
 
 private enum class DownloadStatus {
