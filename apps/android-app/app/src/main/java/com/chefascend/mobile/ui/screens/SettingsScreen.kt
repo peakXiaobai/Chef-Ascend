@@ -2,7 +2,6 @@
 
 package com.chefascend.mobile.ui.screens
 
-import android.app.Activity
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -48,7 +47,6 @@ import com.chefascend.mobile.BuildConfig
 import com.chefascend.mobile.R
 import com.chefascend.mobile.data.model.AndroidReleaseInfo
 import com.chefascend.mobile.data.repository.ChefRepository
-import com.chefascend.mobile.ui.settings.LocaleManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -63,7 +61,6 @@ fun SettingsScreen(
   val appContext = context.applicationContext
   val scope = rememberCoroutineScope()
 
-  var currentLanguage by remember { mutableStateOf(LocaleManager.getSavedLanguage(context)) }
   var updateChecking by remember { mutableStateOf(false) }
   var updateInfo by remember { mutableStateOf<AndroidReleaseInfo?>(null) }
   var updateAvailable by remember { mutableStateOf(false) }
@@ -128,49 +125,6 @@ fun SettingsScreen(
       verticalArrangement = Arrangement.Top
     ) {
       Spacer(modifier = Modifier.height(14.dp))
-      Text(
-        text = stringResource(R.string.settings_language_title),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.SemiBold
-      )
-      Spacer(modifier = Modifier.height(10.dp))
-      Text(
-        text = if (currentLanguage == "en") {
-          stringResource(R.string.settings_language_current_en)
-        } else {
-          stringResource(R.string.settings_language_current_zh)
-        },
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.primary
-      )
-
-      Spacer(modifier = Modifier.height(14.dp))
-      Button(
-        onClick = {
-          LocaleManager.setLanguage(context, "zh")
-          currentLanguage = "zh"
-          (context as? Activity)?.recreate()
-        },
-        modifier = Modifier.fillMaxWidth(),
-        enabled = currentLanguage != "zh"
-      ) {
-        Text(stringResource(R.string.settings_language_zh))
-      }
-
-      Spacer(modifier = Modifier.height(10.dp))
-      OutlinedButton(
-        onClick = {
-          LocaleManager.setLanguage(context, "en")
-          currentLanguage = "en"
-          (context as? Activity)?.recreate()
-        },
-        modifier = Modifier.fillMaxWidth(),
-        enabled = currentLanguage != "en"
-      ) {
-        Text(stringResource(R.string.settings_language_en))
-      }
-
-      Spacer(modifier = Modifier.height(24.dp))
       Text(
         text = stringResource(R.string.settings_update_title),
         style = MaterialTheme.typography.titleMedium,

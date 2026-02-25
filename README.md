@@ -35,7 +35,7 @@ Core product goals:
 - [x] Dish detail page
 - [x] Cook mode page (step/timer actions)
 - [x] Completion submit + records page
-- [x] Settings page with Chinese/English language switch (default Chinese)
+- [x] Settings page with app update check and install flow
 
 ## Runtime Architecture
 

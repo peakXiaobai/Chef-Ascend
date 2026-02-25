@@ -33,11 +33,8 @@ Both are currently defined in `apps/android-app/app/build.gradle.kts`.
 
 ## Localization
 
-- Default UI language is Simplified Chinese (`values/strings.xml`).
-- English resources live in `values-en/strings.xml`.
-- Users can switch language in app settings:
-  - Catalog top-right gear icon -> Settings -> choose Chinese or English
-- Language preference persists locally and is applied on next launch.
+- App UI is fixed to Simplified Chinese (`values/strings.xml`).
+- Settings page keeps update management features only (check/update/download/install).
 
 ## Next Improvements
 

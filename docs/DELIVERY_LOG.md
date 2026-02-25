@@ -204,3 +204,23 @@
   - `docs/api/API_V1.md`
 - Follow-up:
   - Add checksum validation before install prompt
+
+## 2026-02-25 (Phase 11 - Chinese-only UI Cleanup)
+
+- Owner: Codex
+- Scope:
+  - Removed in-app language switch from Android settings page
+  - Removed locale wrapper integration from `MainActivity` and `ChefAscendApplication`
+  - Deleted English string resources and locale manager implementation
+  - Kept settings update flow (check/download/install) unchanged
+- Files changed:
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/screens/SettingsScreen.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/MainActivity.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ChefAscendApplication.kt`
+  - `apps/android-app/app/src/main/res/values/strings.xml`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/settings/LocaleManager.kt` (deleted)
+  - `apps/android-app/app/src/main/res/values-en/strings.xml` (deleted)
+  - `README.md`
+  - `docs/mobile/ANDROID_APP.md`
+- Follow-up:
+  - Rebuild APK and verify settings page no longer crashes on locale actions
