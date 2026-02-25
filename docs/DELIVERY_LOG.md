@@ -289,3 +289,17 @@
   - `docs/DELIVERY_LOG.md`
 - Follow-up:
   - Remove temporary detection capability after user confirms update path
+
+## 2026-02-25 (Phase 16 - Temporary Capability Rollback)
+
+- Owner: Codex
+- Scope:
+  - Removed temporary update-detection build pointer and restored stable defaults (`0.5.0`, `versionCode=5`)
+  - Rolled back server-side latest metadata to stable release and removed temporary `0.5.1` canonical artifact
+- Files changed:
+  - `apps/android-app/app/build.gradle.kts`
+  - `src/config/env.ts`
+  - `.env.example`
+  - `docs/DELIVERY_LOG.md`
+- Follow-up:
+  - Continue release progression from stable baseline when preparing next real version
