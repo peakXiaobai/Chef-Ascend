@@ -262,3 +262,16 @@
   - `.env.example`
 - Follow-up:
   - Move Chef Ascend APK binary to `:18080` canonical path and set `ANDROID_APK_DOWNLOAD_URL`
+
+## 2026-02-25 (Phase 14 - Happy AI Handoff + Chef Rollout)
+
+- Owner: Codex
+- Scope:
+  - Added a direct handoff guide for the `happy-app` assistant to execute release-center migration
+  - Provided command-ready checklist, `latest.json` template, and acceptance criteria
+  - Completed Chef rollout on server: canonical path in `:18080`, release metadata, and API `download_url` switch
+- Files changed:
+  - `docs/release/HAPPY_APP_AI_HANDOFF.md`
+  - `README.md`
+- Follow-up:
+  - Let `happy-app` assistant execute the handoff doc and report the resulting `latest.json` + APK URL

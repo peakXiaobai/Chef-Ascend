@@ -60,7 +60,8 @@ Chef-Ascend/
 │   ├── mobile/
 │   │   └── ANDROID_APP.md           # android app architecture and setup
 │   ├── release/
-│   │   └── APK_RELEASE_CENTER_SPEC.md # multi-app apk release/distribution policy
+│   │   ├── APK_RELEASE_CENTER_SPEC.md # multi-app apk release/distribution policy
+│   │   └── HAPPY_APP_AI_HANDOFF.md    # execution handoff for happy app assistant
 │   ├── api/
 │   │   └── API_V1.md                # HTTP contract for 5 core modules
 │   ├── data/
