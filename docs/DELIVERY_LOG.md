@@ -184,3 +184,23 @@
   - `docs/api/API_V1.md`
 - Follow-up:
   - Add APK signature verification prompt and optional force-update policy field
+
+## 2026-02-25 (Phase 10 - Update Progress + Auto Install Prompt)
+
+- Owner: Codex
+- Scope:
+  - Added in-app silent download progress tracking for APK update tasks in settings
+  - Added download-complete auto install prompt flow (Android package installer intent)
+  - Added install-permission declaration and update-related UX copy in zh/en resources
+  - Bumped Android app version to `0.3.0` (`versionCode=3`) for update path validation
+- Files changed:
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/screens/SettingsScreen.kt`
+  - `apps/android-app/app/src/main/AndroidManifest.xml`
+  - `apps/android-app/app/src/main/res/values/strings.xml`
+  - `apps/android-app/app/src/main/res/values-en/strings.xml`
+  - `apps/android-app/app/build.gradle.kts`
+  - `src/config/env.ts`
+  - `.env.example`
+  - `docs/api/API_V1.md`
+- Follow-up:
+  - Add checksum validation before install prompt

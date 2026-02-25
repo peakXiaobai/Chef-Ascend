@@ -70,6 +70,7 @@
     <string name="settings_update_title">App Update</string>
     <string name="settings_update_current_version">Current version: %1$s (%2$d)</string>
     <string name="settings_update_check">Check for updates</string>
+    <string name="settings_update_checking">Checking...</string>
     <string name="settings_update_found">New version found: %1$s (%2$d)</string>
     <string name="settings_update_latest">You are on the latest version</string>
     <string name="settings_update_check_failed">Failed to check updates, try again later</string>
@@ -77,7 +78,11 @@
     <string name="settings_update_file_info">Package size: %1$s · Updated: %2$s</string>
     <string name="settings_update_notes">Release notes: %1$s</string>
     <string name="settings_update_download">Download and update</string>
-    <string name="settings_update_downloading">Download started, install after completion</string>
+    <string name="settings_update_downloading">Downloading in background, installer opens automatically when done</string>
+    <string name="settings_update_progress">Download progress: %1$d%%</string>
+    <string name="settings_update_install_prompt">Download completed, installer opened</string>
+    <string name="settings_update_install_failed">Download completed, but failed to open installer</string>
+    <string name="settings_update_download_failed">Download failed, please retry later</string>
 
     <string name="common_back">Back</string>
 

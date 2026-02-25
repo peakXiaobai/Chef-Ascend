@@ -4,8 +4,10 @@ package com.chefascend.mobile.ui.screens
 
 import android.app.Activity
 import android.app.DownloadManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import androidx.compose.foundation.layout.Arrangement
@@ -21,18 +23,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,6 +49,7 @@ import com.chefascend.mobile.data.model.AndroidReleaseInfo
 import com.chefascend.mobile.data.repository.ChefRepository
 import com.chefascend.mobile.ui.settings.LocaleManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -53,12 +59,54 @@ fun SettingsScreen(
   onBack: () -> Unit
 ) {
   val context = LocalContext.current
+  val appContext = context.applicationContext
   val scope = rememberCoroutineScope()
+
   var currentLanguage by remember { mutableStateOf(LocaleManager.getSavedLanguage(context)) }
   var updateChecking by remember { mutableStateOf(false) }
   var updateInfo by remember { mutableStateOf<AndroidReleaseInfo?>(null) }
   var updateAvailable by remember { mutableStateOf(false) }
   var updateMessage by remember { mutableStateOf<String?>(null) }
+  var activeDownloadId by remember { mutableLongStateOf(-1L) }
+  var downloadProgress by remember { mutableFloatStateOf(0f) }
+
+  val isDownloading = activeDownloadId > 0L
+
+  DisposableEffect(appContext, activeDownloadId) {
+    val receiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != DownloadManager.ACTION_DOWNLOAD_COMPLETE) {
+          return
+        }
+
+        val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
+        if (downloadId != activeDownloadId || downloadId <= 0L) {
+          return
+        }
+
+        scope.launch {
+          val result = withContext(Dispatchers.IO) { resolveDownloadResult(appContext, downloadId) }
+          activeDownloadId = -1L
+          downloadProgress = 0f
+          if (result.status == DownloadStatus.Success && result.uri != null) {
+            val launched = launchInstallIntent(appContext, result.uri)
+            updateMessage = if (launched) {
+              context.getString(R.string.settings_update_install_prompt)
+            } else {
+              context.getString(R.string.settings_update_install_failed)
+            }
+          } else {
+            updateMessage = context.getString(R.string.settings_update_download_failed)
+          }
+        }
+      }
+    }
+
+    appContext.registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+    onDispose {
+      runCatching { appContext.unregisterReceiver(receiver) }
+    }
+  }
 
   Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.settings_title)) }) }) { padding ->
     Column(
@@ -153,22 +201,18 @@ fun SettingsScreen(
           }
         },
         modifier = Modifier.fillMaxWidth(),
-        enabled = !updateChecking
+        enabled = !updateChecking && !isDownloading
       ) {
         Text(stringResource(R.string.settings_update_check))
       }
 
       if (updateChecking) {
         Spacer(modifier = Modifier.height(10.dp))
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.Center,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
           CircularProgressIndicator(modifier = Modifier.size(18.dp))
           Spacer(modifier = Modifier.width(8.dp))
           Text(
-            text = stringResource(R.string.settings_update_check),
+            text = stringResource(R.string.settings_update_checking),
             style = MaterialTheme.typography.bodySmall
           )
         }
@@ -209,13 +253,45 @@ fun SettingsScreen(
         OutlinedButton(
           onClick = {
             val latest = updateInfo ?: return@OutlinedButton
-            enqueueApkDownload(context, latest)
+            val downloadId = startApkDownload(appContext, latest)
+            if (downloadId <= 0L) {
+              updateMessage = context.getString(R.string.settings_update_download_failed)
+              return@OutlinedButton
+            }
+
+            activeDownloadId = downloadId
+            downloadProgress = 0f
             updateMessage = context.getString(R.string.settings_update_downloading)
+
+            scope.launch {
+              trackDownloadProgress(
+                context = appContext,
+                downloadId = downloadId,
+                onProgress = { progress -> downloadProgress = progress }
+              )
+            }
           },
-          modifier = Modifier.fillMaxWidth()
+          modifier = Modifier.fillMaxWidth(),
+          enabled = !isDownloading
         ) {
           Text(stringResource(R.string.settings_update_download))
         }
+      }
+
+      if (isDownloading) {
+        Spacer(modifier = Modifier.height(10.dp))
+        LinearProgressIndicator(
+          progress = { downloadProgress },
+          modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+          text = stringResource(
+            R.string.settings_update_progress,
+            (downloadProgress * 100).toInt().coerceIn(0, 100)
+          ),
+          style = MaterialTheme.typography.bodySmall
+        )
       }
 
       if (updateMessage != null) {
@@ -235,22 +311,88 @@ fun SettingsScreen(
   }
 }
 
-private fun enqueueApkDownload(context: Context, latest: AndroidReleaseInfo) {
-  runCatching {
+private fun startApkDownload(context: Context, latest: AndroidReleaseInfo): Long {
+  return runCatching {
     val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
     val request = DownloadManager.Request(Uri.parse(latest.download_url))
       .setTitle("Chef Ascend ${latest.version_name}")
       .setDescription("Chef Ascend APK")
       .setMimeType("application/vnd.android.package-archive")
-      .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+      .setAllowedOverMetered(true)
+      .setAllowedOverRoaming(true)
+      .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION)
       .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, latest.file_name)
     manager.enqueue(request)
-  }.onFailure {
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(latest.download_url))
-    if (context !is Activity) {
-      browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+  }.getOrElse {
+    -1L
+  }
+}
+
+private suspend fun trackDownloadProgress(
+  context: Context,
+  downloadId: Long,
+  onProgress: (Float) -> Unit
+) {
+  val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+  while (true) {
+    val query = DownloadManager.Query().setFilterById(downloadId)
+    val result = manager.query(query).use { cursor ->
+      if (!cursor.moveToFirst()) {
+        DownloadTrack(status = DownloadManager.STATUS_FAILED, progress = 0f)
+      } else {
+        val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+        val downloaded = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+        val total = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+        val progress = if (total > 0) {
+          (downloaded.toFloat() / total.toFloat()).coerceIn(0f, 1f)
+        } else {
+          0f
+        }
+        DownloadTrack(status = status, progress = progress)
+      }
     }
-    context.startActivity(browserIntent)
+
+    onProgress(result.progress)
+    if (result.status == DownloadManager.STATUS_SUCCESSFUL || result.status == DownloadManager.STATUS_FAILED) {
+      return
+    }
+    delay(600)
+  }
+}
+
+private fun resolveDownloadResult(context: Context, downloadId: Long): DownloadResult {
+  val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+  val query = DownloadManager.Query().setFilterById(downloadId)
+  val status = manager.query(query).use { cursor ->
+    if (!cursor.moveToFirst()) {
+      return DownloadResult(DownloadStatus.Failed, null)
+    }
+    cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+  }
+
+  if (status != DownloadManager.STATUS_SUCCESSFUL) {
+    return DownloadResult(DownloadStatus.Failed, null)
+  }
+
+  val uri = manager.getUriForDownloadedFile(downloadId)
+  if (uri == null) {
+    return DownloadResult(DownloadStatus.Failed, null)
+  }
+
+  return DownloadResult(DownloadStatus.Success, uri)
+}
+
+private fun launchInstallIntent(context: Context, apkUri: Uri): Boolean {
+  return runCatching {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+      setDataAndType(apkUri, "application/vnd.android.package-archive")
+      addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(intent)
+    true
+  }.getOrElse {
+    false
   }
 }
 
@@ -270,3 +412,18 @@ private fun formatFileSize(bytes: Long): String {
     else -> "$bytes B"
   }
 }
+
+private data class DownloadTrack(
+  val status: Int,
+  val progress: Float
+)
+
+private enum class DownloadStatus {
+  Success,
+  Failed
+}
+
+private data class DownloadResult(
+  val status: DownloadStatus,
+  val uri: Uri?
+)

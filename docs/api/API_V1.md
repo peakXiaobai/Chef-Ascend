@@ -286,12 +286,12 @@ Implementation status:
 ```json
 {
   "platform": "android",
-  "version_code": 2,
-  "version_name": "0.2.0",
+  "version_code": 3,
+  "version_name": "0.3.0",
   "file_name": "ChefAscend-debug.apk",
   "file_size_bytes": 25248116,
   "updated_at": "2026-02-24T12:45:11.000Z",
   "download_url": "http://118.196.100.121:3000/downloads/ChefAscend-debug.apk",
-  "release_notes": "做菜模式视觉升级，支持应用内检查更新"
+  "release_notes": "支持下载进度显示和下载完成自动弹安装"
 }
 ```
