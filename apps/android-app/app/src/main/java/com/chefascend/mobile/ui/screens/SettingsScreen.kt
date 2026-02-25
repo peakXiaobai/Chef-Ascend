@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -102,9 +103,19 @@ fun SettingsScreen(
       }
     }
 
-    appContext.registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+    val receiverRegistered = runCatching {
+      ContextCompat.registerReceiver(
+        appContext,
+        receiver,
+        IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+        ContextCompat.RECEIVER_NOT_EXPORTED
+      )
+    }.isSuccess
+
     onDispose {
-      runCatching { appContext.unregisterReceiver(receiver) }
+      if (receiverRegistered) {
+        runCatching { appContext.unregisterReceiver(receiver) }
+      }
     }
   }
 
