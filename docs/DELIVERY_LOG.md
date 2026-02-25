@@ -303,3 +303,19 @@
   - `docs/DELIVERY_LOG.md`
 - Follow-up:
   - Continue release progression from stable baseline when preparing next real version
+
+## 2026-02-25 (Phase 17 - Android Entry Animation)
+
+- Owner: Codex
+- Scope:
+  - Added a startup splash animation screen to improve first-screen experience
+  - Added icon breathing/tilt animation with reveal transition
+  - Updated navigation start destination to splash, then auto-enter catalog
+- Files changed:
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/screens/SplashScreen.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/screens/ScreenRoutes.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ChefAscendApp.kt`
+  - `apps/android-app/app/src/main/res/values/strings.xml`
+  - `docs/DELIVERY_LOG.md`
+- Follow-up:
+  - Tune splash duration and animation amplitude based on real-device feel

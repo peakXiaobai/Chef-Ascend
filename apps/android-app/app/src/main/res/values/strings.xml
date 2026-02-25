@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">厨艺登峰</string>
+    <string name="splash_subtitle">每一步都刚刚好</string>
 
     <string name="catalog_title">菜品目录</string>
     <string name="catalog_header">今天想做什么？</string>

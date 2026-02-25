@@ -1,6 +1,7 @@
 package com.chefascend.mobile.ui.screens
 
 sealed class ScreenRoutes(val route: String) {
+  data object Splash : ScreenRoutes("splash")
   data object Catalog : ScreenRoutes("catalog")
   data object Records : ScreenRoutes("records")
   data object Settings : ScreenRoutes("settings")

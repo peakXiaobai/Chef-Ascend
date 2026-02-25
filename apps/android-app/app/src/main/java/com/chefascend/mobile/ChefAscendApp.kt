@@ -16,13 +16,25 @@ import com.chefascend.mobile.ui.screens.DishDetailScreen
 import com.chefascend.mobile.ui.screens.RecordsScreen
 import com.chefascend.mobile.ui.screens.ScreenRoutes
 import com.chefascend.mobile.ui.screens.SettingsScreen
+import com.chefascend.mobile.ui.screens.SplashScreen
 
 @Composable
 fun ChefAscendApp() {
   val navController = rememberNavController()
   val repository = remember { ChefRepository(ApiClient.chefApiService) }
 
-  NavHost(navController = navController, startDestination = ScreenRoutes.Catalog.route) {
+  NavHost(navController = navController, startDestination = ScreenRoutes.Splash.route) {
+    composable(ScreenRoutes.Splash.route) {
+      SplashScreen(
+        onFinished = {
+          navController.navigate(ScreenRoutes.Catalog.route) {
+            popUpTo(ScreenRoutes.Splash.route) { inclusive = true }
+            launchSingleTop = true
+          }
+        }
+      )
+    }
+
     composable(ScreenRoutes.Catalog.route) {
       CatalogScreen(
         repository = repository,
