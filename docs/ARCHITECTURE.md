@@ -6,6 +6,10 @@
   - Handles dish catalog/detail read APIs
   - Handles cook session lifecycle and completion flow
   - Writes/reads PostgreSQL and Redis
+  - Provides Android update metadata API
+- APK Release Center (static host, e.g. `:18080`)
+  - Hosts APK binaries for multiple apps
+  - Hosts `latest.json` metadata per app/channel
 - PostgreSQL
   - Durable source of truth for dish metadata, steps, sessions, records, daily stats
 - Redis
@@ -31,6 +35,11 @@
 2. API updates session status and inserts `cook_records`.
 3. Trigger updates `dish_daily_stats` in PostgreSQL.
 4. API runs Redis Lua script to increment today counter atomically.
+
+### Android Update
+1. Mobile client requests `GET /api/v1/app/android/latest`.
+2. API returns version metadata and release download URL.
+3. APK binary is downloaded from the dedicated APK Release Center.
 
 ## 3) Consistency Strategy
 

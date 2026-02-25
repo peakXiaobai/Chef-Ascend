@@ -286,12 +286,20 @@ Implementation status:
 ```json
 {
   "platform": "android",
-  "version_code": 3,
-  "version_name": "0.3.0",
+  "version_code": 5,
+  "version_name": "0.5.0",
   "file_name": "ChefAscend-debug.apk",
-  "file_size_bytes": 25248116,
-  "updated_at": "2026-02-24T12:45:11.000Z",
-  "download_url": "http://118.196.100.121:3000/downloads/ChefAscend-debug.apk",
-  "release_notes": "支持下载进度显示和下载完成自动弹安装"
+  "file_size_bytes": 21034071,
+  "updated_at": "2026-02-25T03:10:00.000Z",
+  "download_url": "http://118.196.100.121:18080/releases/chef-ascend/android/stable/0.5.0/chef-ascend-0.5.0.apk",
+  "release_notes": "新增实时下载速度与下载百分比展示"
 }
 ```
+
+### Download URL Resolution
+
+- If `ANDROID_APK_DOWNLOAD_URL` is configured, API returns that URL directly.
+- If `ANDROID_APK_DOWNLOAD_URL` is empty, API falls back to local serving URL `/downloads/{filename}`.
+- When using external URL and local file is absent, metadata can be provided by:
+  - `ANDROID_APK_FILE_SIZE_BYTES`
+  - `ANDROID_APK_UPDATED_AT` (ISO datetime)

@@ -3,14 +3,25 @@ import { z } from "zod";
 
 loadDotEnv();
 
+const emptyToUndefined = <TSchema extends z.ZodTypeAny>(schema: TSchema) =>
+  z.preprocess((value) => {
+    if (typeof value === "string" && value.trim() === "") {
+      return undefined;
+    }
+    return value;
+  }, schema.optional());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
   HOST: z.string().default("0.0.0.0"),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).optional(),
   ANDROID_APK_FILENAME: z.string().default("ChefAscend-debug.apk"),
+  ANDROID_APK_DOWNLOAD_URL: emptyToUndefined(z.string().url()),
   ANDROID_APK_VERSION_CODE: z.coerce.number().int().positive().default(5),
   ANDROID_APK_VERSION_NAME: z.string().default("0.5.0"),
+  ANDROID_APK_FILE_SIZE_BYTES: emptyToUndefined(z.coerce.number().int().nonnegative()),
+  ANDROID_APK_UPDATED_AT: emptyToUndefined(z.string().datetime({ offset: true })),
   ANDROID_APK_RELEASE_NOTES: z.string().optional(),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   REDIS_URL: z.string().default("redis://localhost:6379"),

@@ -113,16 +113,27 @@ const bootstrap = async (): Promise<void> => {
     }
 
     const filePath = getReleaseFilePath(filename);
+    const externalDownloadUrl = env.ANDROID_APK_DOWNLOAD_URL?.trim();
     const host = request.headers.host;
-    if (!host) {
-      return reply.code(500).send({ message: "Host header missing" });
+
+    let fileSizeBytes = env.ANDROID_APK_FILE_SIZE_BYTES ?? 0;
+    let updatedAt = env.ANDROID_APK_UPDATED_AT ?? new Date().toISOString();
+    try {
+      const fileStat = await stat(filePath);
+      fileSizeBytes = fileStat.size;
+      updatedAt = fileStat.mtime.toISOString();
+    } catch {
+      if (!externalDownloadUrl) {
+        return reply.code(404).send({ message: "Android release file not found" });
+      }
     }
 
-    let fileStat: Awaited<ReturnType<typeof stat>>;
-    try {
-      fileStat = await stat(filePath);
-    } catch {
-      return reply.code(404).send({ message: "Android release file not found" });
+    let downloadUrl = externalDownloadUrl;
+    if (!downloadUrl) {
+      if (!host) {
+        return reply.code(500).send({ message: "Host header missing" });
+      }
+      downloadUrl = `${request.protocol}://${host}/downloads/${filename}`;
     }
 
     return reply.code(200).send({
@@ -130,9 +141,9 @@ const bootstrap = async (): Promise<void> => {
       version_code: env.ANDROID_APK_VERSION_CODE,
       version_name: env.ANDROID_APK_VERSION_NAME,
       file_name: filename,
-      file_size_bytes: fileStat.size,
-      updated_at: fileStat.mtime.toISOString(),
-      download_url: `${request.protocol}://${host}/downloads/${filename}`,
+      file_size_bytes: fileSizeBytes,
+      updated_at: updatedAt,
+      download_url: downloadUrl,
       release_notes: env.ANDROID_APK_RELEASE_NOTES ?? null
     });
   });

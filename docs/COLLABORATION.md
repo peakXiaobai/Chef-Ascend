@@ -7,9 +7,10 @@ This project is intended to be edited by multiple contributors (including differ
 Always read these files first:
 1. `README.md`
 2. `docs/ARCHITECTURE.md`
-3. `docs/api/API_V1.md`
-4. `docs/data/DB_SCHEMA.md`
-5. `docs/data/REDIS_SCHEMA.md`
+3. `docs/release/APK_RELEASE_CENTER_SPEC.md` (when touching Android update/download flow)
+4. `docs/api/API_V1.md`
+5. `docs/data/DB_SCHEMA.md`
+6. `docs/data/REDIS_SCHEMA.md`
 
 ## 2) Change Scope Rules
 

@@ -59,6 +59,8 @@ Chef-Ascend/
 │   ├── DELIVERY_LOG.md              # phase-by-phase delivery report
 │   ├── mobile/
 │   │   └── ANDROID_APP.md           # android app architecture and setup
+│   ├── release/
+│   │   └── APK_RELEASE_CENTER_SPEC.md # multi-app apk release/distribution policy
 │   ├── api/
 │   │   └── API_V1.md                # HTTP contract for 5 core modules
 │   ├── data/
@@ -158,8 +160,11 @@ Required env vars:
 - `REDIS_URL` (for Redis)
 - `LOG_LEVEL` (recommended `info` in production)
 - `ANDROID_APK_FILENAME` (default `ChefAscend-debug.apk`)
+- `ANDROID_APK_DOWNLOAD_URL` (optional: external release center url, preferred in production)
 - `ANDROID_APK_VERSION_CODE` (android update check version code)
 - `ANDROID_APK_VERSION_NAME` (android update check version name)
+- `ANDROID_APK_FILE_SIZE_BYTES` (optional: use with external url for metadata)
+- `ANDROID_APK_UPDATED_AT` (optional ISO datetime: use with external url for metadata)
 - `ANDROID_APK_RELEASE_NOTES` (optional release notes shown in app)
 
 ## Dish Admin Console
@@ -212,6 +217,12 @@ Android update metadata:
 ```bash
 curl "http://localhost:3000/api/v1/app/android/latest"
 ```
+
+## APK Release Center Policy
+
+- For multi-app APK management, follow `docs/release/APK_RELEASE_CENTER_SPEC.md`.
+- Production should prefer a dedicated download host (for example `:18080`) and configure `ANDROID_APK_DOWNLOAD_URL`.
+- Keep this API service focused on metadata and business APIs; avoid coupling APK file serving with business runtime.
 
 ## Next Build Order
 

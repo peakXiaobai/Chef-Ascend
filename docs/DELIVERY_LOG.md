@@ -242,3 +242,23 @@
   - `.env.example`
 - Follow-up:
   - Verify end-device behavior on both high-bandwidth and weak-network conditions
+
+## 2026-02-25 (Phase 13 - APK Release Center Policy)
+
+- Owner: Codex
+- Scope:
+  - Added repo-level policy for multi-app APK release/distribution (0326)
+  - Defined canonical release path + `latest.json` schema and assistant rules
+  - Added external APK download URL support in Android latest-metadata API
+  - Added optional metadata fallback env vars for external-host mode
+- Files changed:
+  - `docs/release/APK_RELEASE_CENTER_SPEC.md`
+  - `docs/COLLABORATION.md`
+  - `docs/ARCHITECTURE.md`
+  - `docs/api/API_V1.md`
+  - `README.md`
+  - `src/server.ts`
+  - `src/config/env.ts`
+  - `.env.example`
+- Follow-up:
+  - Move Chef Ascend APK binary to `:18080` canonical path and set `ANDROID_APK_DOWNLOAD_URL`
