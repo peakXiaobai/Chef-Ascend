@@ -67,6 +67,17 @@
     <string name="settings_language_current_en">Current language: English</string>
     <string name="settings_language_zh">Switch to Simplified Chinese</string>
     <string name="settings_language_en">Switch to English</string>
+    <string name="settings_update_title">App Update</string>
+    <string name="settings_update_current_version">Current version: %1$s (%2$d)</string>
+    <string name="settings_update_check">Check for updates</string>
+    <string name="settings_update_found">New version found: %1$s (%2$d)</string>
+    <string name="settings_update_latest">You are on the latest version</string>
+    <string name="settings_update_check_failed">Failed to check updates, try again later</string>
+    <string name="settings_update_server_version">Latest version: %1$s (%2$d)</string>
+    <string name="settings_update_file_info">Package size: %1$s · Updated: %2$s</string>
+    <string name="settings_update_notes">Release notes: %1$s</string>
+    <string name="settings_update_download">Download and update</string>
+    <string name="settings_update_downloading">Download started, install after completion</string>
 
     <string name="common_back">Back</string>
 

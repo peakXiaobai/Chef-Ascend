@@ -1,6 +1,7 @@
 package com.chefascend.mobile.data.api
 
 import com.chefascend.mobile.data.model.CatalogResponse
+import com.chefascend.mobile.data.model.AndroidReleaseInfo
 import com.chefascend.mobile.data.model.CompleteSessionRequest
 import com.chefascend.mobile.data.model.CompleteSessionResponse
 import com.chefascend.mobile.data.model.CreateSessionRequest
@@ -65,4 +66,7 @@ interface ChefApiService {
     @Query("page") page: Int = 1,
     @Query("page_size") pageSize: Int = 20
   ): UserRecordsResponse
+
+  @GET("api/v1/app/android/latest")
+  suspend fun getLatestAndroidRelease(): AndroidReleaseInfo
 }

@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import { createReadStream } from "node:fs";
-import { access } from "node:fs/promises";
+import { access, stat } from "node:fs/promises";
 import path from "node:path";
 
 import { env } from "./config/env.js";
@@ -41,6 +41,14 @@ const logger = {
   }
 };
 
+const getReleaseFilePath = (filename: string): string => {
+  return path.join(process.cwd(), "releases", filename);
+};
+
+const isValidReleaseFilename = (filename: string): boolean => {
+  return /^[A-Za-z0-9._-]+$/.test(filename);
+};
+
 const shutdown = async (): Promise<void> => {
   app.log.info("Shutting down server...");
   await app.close();
@@ -79,11 +87,11 @@ const bootstrap = async (): Promise<void> => {
   app.get("/downloads/:filename", async (request, reply) => {
     const params = request.params as { filename?: string };
     const filename = params.filename ?? "";
-    if (!/^[A-Za-z0-9._-]+$/.test(filename)) {
+    if (!isValidReleaseFilename(filename)) {
       return reply.code(400).send({ message: "Invalid filename" });
     }
 
-    const filePath = path.join(process.cwd(), "releases", filename);
+    const filePath = getReleaseFilePath(filename);
     try {
       await access(filePath);
     } catch {
@@ -93,6 +101,37 @@ const bootstrap = async (): Promise<void> => {
     reply.header("Content-Type", "application/vnd.android.package-archive");
     reply.header("Content-Disposition", `attachment; filename=\"${filename}\"`);
     return reply.send(createReadStream(filePath));
+  });
+
+  app.get("/api/v1/app/android/latest", async (request, reply) => {
+    const filename = env.ANDROID_APK_FILENAME;
+    if (!isValidReleaseFilename(filename)) {
+      return reply.code(500).send({ message: "Invalid ANDROID_APK_FILENAME configuration" });
+    }
+
+    const filePath = getReleaseFilePath(filename);
+    const host = request.headers.host;
+    if (!host) {
+      return reply.code(500).send({ message: "Host header missing" });
+    }
+
+    let fileStat: Awaited<ReturnType<typeof stat>>;
+    try {
+      fileStat = await stat(filePath);
+    } catch {
+      return reply.code(404).send({ message: "Android release file not found" });
+    }
+
+    return reply.code(200).send({
+      platform: "android",
+      version_code: env.ANDROID_APK_VERSION_CODE,
+      version_name: env.ANDROID_APK_VERSION_NAME,
+      file_name: filename,
+      file_size_bytes: fileStat.size,
+      updated_at: fileStat.mtime.toISOString(),
+      download_url: `${request.protocol}://${host}/downloads/${filename}`,
+      release_notes: env.ANDROID_APK_RELEASE_NOTES ?? null
+    });
   });
 
   const dishesRepository = new DishesRepository(pool);

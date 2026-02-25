@@ -101,3 +101,14 @@ data class UserRecord(
   val rating: Int?,
   val cooked_at: String
 )
+
+data class AndroidReleaseInfo(
+  val platform: String,
+  val version_code: Int,
+  val version_name: String,
+  val file_name: String,
+  val file_size_bytes: Long,
+  val updated_at: String,
+  val download_url: String,
+  val release_notes: String?
+)

@@ -23,6 +23,7 @@ Implementation status:
   - `POST /api/v1/admin/dishes`
   - `PUT /api/v1/admin/dishes/{dish_id}`
   - `PATCH /api/v1/admin/dishes/{dish_id}/active`
+  - `GET /api/v1/app/android/latest`
 - Planned: other endpoints in this document
 
 ## 1) List Dishes
@@ -273,5 +274,24 @@ Implementation status:
 ```json
 {
   "is_active": false
+}
+```
+
+## 10) Android Update Metadata
+
+`GET /api/v1/app/android/latest`
+
+### Response 200
+
+```json
+{
+  "platform": "android",
+  "version_code": 2,
+  "version_name": "0.2.0",
+  "file_name": "ChefAscend-debug.apk",
+  "file_size_bytes": 25248116,
+  "updated_at": "2026-02-24T12:45:11.000Z",
+  "download_url": "http://118.196.100.121:3000/downloads/ChefAscend-debug.apk",
+  "release_notes": "做菜模式视觉升级，支持应用内检查更新"
 }
 ```

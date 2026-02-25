@@ -110,7 +110,10 @@ fun ChefAscendApp() {
     }
 
     composable(ScreenRoutes.Settings.route) {
-      SettingsScreen(onBack = { navController.popBackStack() })
+      SettingsScreen(
+        repository = repository,
+        onBack = { navController.popBackStack() }
+      )
     }
   }
 }

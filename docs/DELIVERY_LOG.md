@@ -159,3 +159,28 @@
   - `docs/api/API_V1.md`
 - Follow-up:
   - Add auth/permission layer for admin console before exposing to public internet
+
+## 2026-02-24 (Phase 9 - Android In-App Update Check)
+
+- Owner: Codex
+- Scope:
+  - Added backend endpoint `GET /api/v1/app/android/latest` for APK version metadata and download URL
+  - Added update-related env config (`ANDROID_APK_FILENAME`, `ANDROID_APK_VERSION_CODE`, `ANDROID_APK_VERSION_NAME`, `ANDROID_APK_RELEASE_NOTES`)
+  - Added Android settings-page update capability: check latest version, show release info, and trigger APK download via DownloadManager
+  - Bumped Android app version to `0.2.0` (`versionCode=2`) for upgrade detection
+- Files changed:
+  - `src/server.ts`
+  - `src/config/env.ts`
+  - `.env.example`
+  - `apps/android-app/app/build.gradle.kts`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ChefAscendApp.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/data/api/ChefApiService.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/data/model/ApiModels.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/data/repository/ChefRepository.kt`
+  - `apps/android-app/app/src/main/java/com/chefascend/mobile/ui/screens/SettingsScreen.kt`
+  - `apps/android-app/app/src/main/res/values/strings.xml`
+  - `apps/android-app/app/src/main/res/values-en/strings.xml`
+  - `README.md`
+  - `docs/api/API_V1.md`
+- Follow-up:
+  - Add APK signature verification prompt and optional force-update policy field

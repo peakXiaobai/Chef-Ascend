@@ -157,6 +157,10 @@ Required env vars:
 - `DATABASE_URL` (for PostgreSQL)
 - `REDIS_URL` (for Redis)
 - `LOG_LEVEL` (recommended `info` in production)
+- `ANDROID_APK_FILENAME` (default `ChefAscend-debug.apk`)
+- `ANDROID_APK_VERSION_CODE` (android update check version code)
+- `ANDROID_APK_VERSION_NAME` (android update check version name)
+- `ANDROID_APK_RELEASE_NOTES` (optional release notes shown in app)
 
 ## Dish Admin Console
 
@@ -201,6 +205,12 @@ curl -X POST "http://localhost:3000/api/v1/cook-sessions/1/complete" \
 
 ```bash
 curl "http://localhost:3000/api/v1/users/1/cook-records?page=1&page_size=20"
+```
+
+Android update metadata:
+
+```bash
+curl "http://localhost:3000/api/v1/app/android/latest"
 ```
 
 ## Next Build Order

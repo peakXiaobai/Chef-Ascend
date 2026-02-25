@@ -1,6 +1,7 @@
 package com.chefascend.mobile.data.repository
 
 import com.chefascend.mobile.data.api.ChefApiService
+import com.chefascend.mobile.data.model.AndroidReleaseInfo
 import com.chefascend.mobile.data.model.CatalogResponse
 import com.chefascend.mobile.data.model.CompleteSessionRequest
 import com.chefascend.mobile.data.model.CompleteSessionResponse
@@ -47,4 +48,6 @@ class ChefRepository(private val api: ChefApiService) {
   }
 
   suspend fun getUserRecords(userId: Long): UserRecordsResponse = api.getUserRecords(userId)
+
+  suspend fun getLatestAndroidRelease(): AndroidReleaseInfo = api.getLatestAndroidRelease()
 }
